@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href='Stylesheet.css'>
+
+    <title>Library Management System</title>
+
+    <script src="src/LibraryModel.js" defer></script>
+    <script src="src/LibraryView.js" defer></script>
+    <script src="src/LibraryController.js" defer></script>
+    <script src="src/lib/Classes.js" defer></script>
+    <script type="application/json" src="src/lib/books.json" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1><a href="#" onclick="loadPage('home', event)">Library Management System</a></h1>
+
+        <nav>
+            <ul>
+                <li><a href="#" onclick="loadPage('user-management', event)">User Management</a></li>
+                <li><a href="#" onclick="loadPage('catalogue-management', event)">Catalogue Management</a></li>
+                <li><a href="#" onclick="loadPage('borrow-or-return', event)">Borrow or Return Books</a></li>
+                <li><a href="#" onclick="loadPage('catalogue-search', event)">Catalogue Search</a></li>
+            </ul>
+        </nav>
+
+        <main id="main">
+
+        </main>
+
+    </div>
+    <footer id="footer"></footer>
+</body>
+</html>
