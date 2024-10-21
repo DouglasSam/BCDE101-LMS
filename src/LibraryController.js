@@ -1,10 +1,14 @@
 // Controller: Handles user input and updates Model/View
 class CatalogueManagementController {
+    
     constructor(model, view) {
         this.model = model;
         this.view = view;
     }
-    
+
+    /**
+     * Sets the current view for the controller
+     */
     setCurrentView() {
         this.view.render();
         // DOM Elements
@@ -21,9 +25,33 @@ class CatalogueManagementController {
 
         // Initial render
         this.view.updateBookTable(this.model.getBooks());
-        this.addUpdateButtonListeners();
+        this.addButtonListeners();
     }
-    
+
+    /**
+     * Add all button listeners for the page that are not initially rendered
+     */
+    addButtonListeners() {
+        const updateBookButtons = document.querySelectorAll('.update-book');
+        updateBookButtons.forEach(button => {
+            button.addEventListener('click', this.handleUpdateBook.bind(this));
+        });
+
+        const removeBookButtons = document.querySelectorAll('.remove-book');
+        removeBookButtons.forEach(button => {
+            button.addEventListener('click', this.handleRemoveBook.bind(this));
+        });
+
+        const updateButtons = document.querySelectorAll('.update-btn');
+        updateButtons.forEach(button => {
+            button.addEventListener('click', this.handleEditBook.bind(this));
+        });
+    }
+
+    /**
+     * EventListener to clear all books from the storage
+     * @param event - event for the listener
+     */
     handleResetBooks(event) {
         event.preventDefault();
         if (confirm(`Are you sure you want to permanently delete ALL books?`)) {
@@ -32,17 +60,25 @@ class CatalogueManagementController {
         }
     }
 
+    /**
+     * EvenListener for resetting the books stored with the starting data set
+     * @param event - event for the listener
+     */
     handleLoadBooksFromDataSet(event) {
         event.preventDefault();
         if (confirm(`Are you sure you want to replace ALL books with those defined in the starting data set?`)) {
             this.model.clearAllBooks();
             this.model.resetBooksFromDataSet().then(() => {
                 this.view.updateBookTable(this.model.getBooks());
-                this.addUpdateButtonListeners();
+                this.addButtonListeners();
             });
         }
     }
-    
+
+    /**
+     * EventListener for adding a book to the catalogue
+     * @param event - event for the listener
+     */
     handleAddBook(event) {
         event.preventDefault();
         const title = document.getElementById('title').value;
@@ -58,33 +94,36 @@ class CatalogueManagementController {
 
         this.view.clearForm();
         this.view.updateBookTable(this.model.getBooks());
-        this.addUpdateButtonListeners();
+        this.addButtonListeners();
     }
 
+    /**
+     * Handles the search bar on the page
+     */
     handleSearch() {
         const query = this.searchInput.value;
         const filteredBooks = this.model.searchBooks({query: query});
         this.view.updateBookTable(filteredBooks);
-        this.addUpdateButtonListeners();
+        this.addButtonListeners();
     }
 
-    addUpdateButtonListeners() {
-        const updateButtons = document.querySelectorAll('.update-btn');
-        updateButtons.forEach(button => {
-            button.addEventListener('click', this.handleEditBook.bind(this));
-        });
-    }
-
+    /**
+     * EventListener for changing the row in the table to the edit view
+     * @param event - event for the listener
+     */
     handleEditBook(event) {
         const rowID = event.target.getAttribute('data-row-id');
         const id = event.target.getAttribute('data-book-id');
         const book = this.model.searchBooks({id: id})[0];
 
         this.view.changeToEditMode(rowID, book);
-        this.addEditUpdateButtonListeners();
-        this.addEditRemoveButtonListeners();
+        this.addButtonListeners();
     }
-    
+
+    /**
+     * EventListener for updating a book in the catalogue
+     * @param event - event for the listener
+     */
     handleUpdateBook(event) {
         event.preventDefault();
         const rowID = event.target.attributes.item(2).value;
@@ -95,9 +134,13 @@ class CatalogueManagementController {
         this.model.updateBook(newTitle, newAuthor, newISBN, newAvailability);
         const newBook = this.model.getBooks().find(book => book.isbn === newISBN);  
         this.view.changeToViewMode(rowID, newBook);
-        this.addUpdateButtonListeners();
+        this.addButtonListeners();
     }
-    
+
+    /**
+     * EventListener for removing a book from the catalogue
+     * @param event - event for the listener
+     */
     handleRemoveBook(event) {
         event.preventDefault();
         const id = event.target.attributes.item(2).value;
@@ -106,23 +149,10 @@ class CatalogueManagementController {
         if (confirm(`Are you sure you want to permanently delete ${book.title} by ${book.author }?`)) {
             this.model.removeBook(id);
             this.view.updateBookTable(this.model.getBooks());
-            this.addUpdateButtonListeners();
+            this.addButtonListeners();
         }
     }
     
-    addEditUpdateButtonListeners() {
-        const updateButtons = document.querySelectorAll('.update');
-        updateButtons.forEach(button => {
-            button.addEventListener('click', this.handleUpdateBook.bind(this));
-        });
-    }
-    
-    addEditRemoveButtonListeners() {
-        const updateButtons = document.querySelectorAll('.remove');
-        updateButtons.forEach(button => {
-            button.addEventListener('click', this.handleRemoveBook.bind(this));
-        });
-    }
 }
 
 class UserManagementController {
@@ -148,9 +178,6 @@ class BorrowReturnController {
     setCurrentView() {
         this.view.render();
         
-        const searchToggleButton = document.getElementById("search-toggle");
-        
-        searchToggleButton.addEventListener('click', this.toggleSearchForm.bind(this))
     }
 
     toggleSearchForm(event) {
@@ -169,6 +196,9 @@ class SearchController {
         this.view = view;
     }
 
+    /**
+     * Sets the current view for the controller
+     */
     setCurrentView() {
         this.view.render(this.model.getBooks().length, this.model.searchMode);
         const searchToggleButton = document.getElementById("search-toggle");
@@ -178,11 +208,11 @@ class SearchController {
     }
 
     /**
-     * Handles all the button listeners for the page
+     * Handles all the button listeners for the page that are not initially rendered
      */
     handleButtonListeners() {
-        const updateButtons = document.querySelectorAll('.view-details-btn');
-        updateButtons.forEach(button => {
+        const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+        viewDetailsButtons.forEach(button => {
             button.addEventListener('click', this.handleViewDetails.bind(this));
         });
 
@@ -206,7 +236,8 @@ class SearchController {
     
     
     /**
-     * Will return the details view back to the list view
+     * EventListener that will return the details view back to the list view
+     * @param event - event for the listener
      */
     handleExitDetailView(event) {
         const id = event.target.getAttribute('data-book-id');
@@ -215,7 +246,11 @@ class SearchController {
         this.view.changeToViewMode(rowId, book);
         this.handleButtonListeners()
     }
-    
+
+    /**
+     * EventListener that will change the row to the details view
+     * @param event - event for the listener
+     */
     handleViewDetails(event) {
         const id = event.target.getAttribute('data-book-id');
         const rowId = event.target.getAttribute('data-row-id');
@@ -224,12 +259,22 @@ class SearchController {
         this.handleButtonListeners()
         
     }
-    
-    handleBorrow() {
+
+    /**
+     * EventListener that will handle a user borrowing a book
+     * @param event - event for the listener
+     */
+    handleBorrow(event) {
+        const id = event.target.getAttribute('data-book-id');
+        const rowId = event.target.getAttribute('data-row-id');
         //TODO
-        console.log("Borrowing book");
+        console.log(`Borrowing book ${id} from row ${rowId}`);
     }
 
+    /**
+     * EventListener that will toggle the search form between simple and complex
+     * @param event - event for the listener
+     */
     toggleSearchForm(event) {
         event.preventDefault();
         this.model.toggleSearchMode();
@@ -242,6 +287,10 @@ class SearchController {
         this.handleButtonListeners();
     }
 
+    /**
+     * EventListener for handling and displaying a simple search
+     * @param event - event for the listener
+     */
     handleSimpleSearch(event) {
         event.preventDefault();
         const query = document.getElementById('simple-search-input').value;
@@ -256,6 +305,10 @@ class SearchController {
         
     }
 
+    /**
+     * EventListener for handling and displaying a complex search
+     * @param event - event for the listener
+     */
     handleComplexSearch(event) {
         event.preventDefault();
         const title = document.getElementById('title').value;
@@ -295,6 +348,7 @@ class HomeController {
     }
 }
 
+// Map of the different controllers to a string key
 const controllers = new Map();
 
 // On Load
@@ -313,10 +367,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPage(currentPage);
 });
 
+/**
+ * Function to load a page by the id and EventListener for the navbar
+ * @param id - id of the page to load
+ * @param event - event for the listener
+ */
 function loadPage(id, event) {
     if (event) {
         event.preventDefault();
     }
+    console.log(event)
     console.log("Loading page: " + id);
     let controller = controllers.get(id);
     if (!controller) {
