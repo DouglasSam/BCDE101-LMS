@@ -1,9 +1,20 @@
 /**
- * Class that handled the management of the catalogue
+ * @file LibraryController.js
+ * @fileOverview File that contains the controllers for the library system
+ * The controllers handle the logic of the system and interact with the models and views
+ * @author Samuel Douglas
+ * @copyright Samuel Douglas
+ */
+
+/**
+ * @class CatalogueManagementController
+ * @classDesc Class that handled the management of the catalogue
  * The management of the catalogue includes adding, updating, and removing books
  * It also has a search function to search for books in the catalogue to make updating one book easier
  * It also has a reset function to reset the books in the catalogue to the starting data set
  * It also has a clear function to clear all books from the catalogue
+ * @author Samuel Douglas
+ * @copyright Samuel Douglas
  */
 class CatalogueManagementController {
     
@@ -162,7 +173,10 @@ class CatalogueManagementController {
 }
 
 /**
- * Class that handles the users of the library
+ * @class UserManagementController
+ * @classDesc Class that handles the users of the library
+ * @author Samuel Douglas
+ * @copyright Samuel Douglas
  */
 class UserManagementController {
     
@@ -178,7 +192,10 @@ class UserManagementController {
 }
 
 /**
- * Class that handles the return of books
+ * @class ReturnModel
+ * @classDesc Class that handles the return of books
+ * @author Samuel Douglas
+ * @copyright Samuel Douglas
  */
 class ReturnController {
 
@@ -201,11 +218,13 @@ class ReturnController {
 }
 
 /**
- * Class that handles searching of the catalogue
+ * @class SearchController
+ * @classDesc Class that handles searching of the catalogue
  * Gives user the option to use a simple search query or complex 
  *      allowing for searching in the different sections of the book or only available books
  * Allows users to view all details about the book handles the borrowing of books
- * 
+ * @author Samuel Douglas
+ * @copyright Samuel Douglas
  */
 class SearchController {
     
@@ -355,7 +374,10 @@ class SearchController {
 }
 
 /**
- * Class that handles the home page, no logic just a view
+ * @class HomeController
+ * @classDesc Class that handles the home page, no logic just a view
+ * @author Samuel Douglas
+ * @copyright Samuel Douglas
  */
 class HomeController {
     
