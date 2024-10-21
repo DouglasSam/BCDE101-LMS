@@ -2,6 +2,18 @@
  * @file LibraryController.js
  * @fileOverview File that contains the controllers for the library system
  * The controllers handle the logic of the system and interact with the models and views
+ * @module LibraryController
+ * @requires Catalogue
+ * @requires CatalogueManagementModel
+ * @requires CatalogueManagementView
+ * @requires UserManagementModel
+ * @requires UserManagementView
+ * @requires ReturnModel
+ * @requires ReturnView
+ * @requires SearchModel
+ * @requires SearchView
+ * @requires HomeView
+ * @requires sessionStorage
  * @author Samuel Douglas
  * @copyright Samuel Douglas
  */
@@ -15,15 +27,6 @@
  * It also has a clear function to clear all books from the catalogue
  * @property {CatalogueManagementModel} model - The model for the controller
  * @property {CatalogueManagementView} view - The view for the controller
- * @method setCurrentView - Sets the current view for the controller
- * @method addButtonListeners - Adds all button listeners for the page that are not initially rendered
- * @method handleResetBooks - EventListener to clear all books from the storage
- * @method handleLoadBooksFromDataSet - EvenListener for resetting the books stored with the starting data set
- * @method handleAddBook - EventListener for adding a book to the catalogue
- * @method handleSearch - Handles the search bar on the page
- * @method handleEditBook - EventListener for changing the row in the table to the edit view
- * @method handleUpdateBook - EventListener for updating a book in the catalogue
- * @method handleRemoveBook - EventListener for removing a book from the catalogue
  * @constructor - Creates a new CatalogueManagementController
  * @author Samuel Douglas
  * @copyright Samuel Douglas
@@ -193,8 +196,6 @@ class CatalogueManagementController {
  * @classDesc Class that handles the users of the library
  * @property {UserManagementModel} model - The model for the controller
  * @property {UserManagementView} view - The view for the controller
- * @method setCurrentView - Sets the current view for the controller
- * //TODO when finished
  * @constructor - Creates a new UserManagementController
  * @author Samuel Douglas
  * @copyright Samuel Douglas
@@ -217,8 +218,6 @@ class UserManagementController {
  * @classDesc Class that handles the user returning books
  * @property {ReturnModel} model - The model for the controller
  * @property {ReturnView} view - The view for the controller
- * @method setCurrentView - Sets the current view for the controller
- * //TODO when finished
  * @constructor - Creates a new ReturnModel
  * @author Samuel Douglas
  * @copyright Samuel Douglas
@@ -251,14 +250,6 @@ class ReturnController {
  * Allows users to view all details about the book handles the borrowing of books
  * @property {SearchModel} model - The model for the controller
  * @property {SearchView} view - The view for the controller
- * @method setCurrentView - Sets the current view for the controller
- * @method handleButtonListeners - Handles all the button listeners for the page that are not initially rendered
- * @method handleExitDetailView - EventListener that will return the details view back to the list view
- * @method handleViewDetails - EventListener that will change the row to the details view
- * @method handleBorrow - EventListener that will handle a user borrowing a book
- * @method toggleSearchForm - EventListener that will toggle the search form between simple and complex
- * @method handleSimpleSearch - EventListener for handling and displaying a simple search
- * @method handleComplexSearch - EventListener for handling and displaying a complex search
  * @constructor - Creates a new SearchController
  * @author Samuel Douglas
  * @copyright Samuel Douglas
@@ -414,7 +405,6 @@ class SearchController {
  * @class HomeController
  * @classDesc Class that handles the home page, no logic just a view
  * @property {HomeView} view - The view for the controller
- * @method setCurrentView - Sets the current view for the controller
  * @constructor - Creates a new HomeController
  * @author Samuel Douglas
  * @copyright Samuel Douglas
