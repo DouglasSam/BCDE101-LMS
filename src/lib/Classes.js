@@ -1,6 +1,7 @@
 /**
  * @file Classes.js
  * @description Contains the classes that handles objects for the library system
+ * @module Classes
  * @author Samuel Douglas
  * @copyright Samuel Douglas
  */
@@ -16,8 +17,6 @@
  * @property {boolean} #availability - Whether the book is available
  * @property {string} #location - The location of the book
  * @property {string} #description - The description of the book
- * @method searchBooks - Searches for books in the catalogue
- * @method viewBookDetails - Gets the private fields and returns them as an object for reading all details of the book
  * @constructor - Creates a new book
  * @author Samuel Douglas
  * @copyright Samuel Douglas
@@ -114,11 +113,6 @@ class Book {
  * @class Catalogue
  * @classdesc Represents a catalogue of books in the library system
  * @property {Book[]} #books - The books in the catalogue
- * @method addBook - Adds a book to the catalogue
- * @method updateBook - Updates a book in the catalogue
- * @method deleteBook - Deletes a book from the catalogue
- * @method searchBooks - Searches for books in the catalogue
- * @method getBooks - Gets all the books in the catalogue
  * @constructor - Creates a new catalogue
  * @author Samuel Douglas
  * @copyright Samuel Douglas
