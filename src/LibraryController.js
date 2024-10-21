@@ -63,7 +63,7 @@ class CatalogueManagementController {
 
     handleSearch() {
         const query = this.searchInput.value;
-        const filteredBooks = this.model.searchBooks(query);
+        const filteredBooks = this.model.searchBooks({query: query} );
         this.view.updateBookTable(filteredBooks);
         this.addUpdateButtonListeners();
     }
