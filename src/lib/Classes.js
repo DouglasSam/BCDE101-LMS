@@ -76,16 +76,15 @@ class Catalogue {
         this.#books.push(new Book(id, title, author, isbn, availability, location, description, genre));
     }
 
-    // TODO update using ID
-    updateBook(isbn, title, author, availability) {
-        const index = this.#books.findIndex(book => book.viewBookDetails().isbn === isbn);
+        updateBook(bookId, isbn, title, author, genre, location, description, availability) {
+        const index = this.#books.findIndex(book => book.viewBookDetails().bookId.toString() === bookId.toString());
         if (index !== -1) {
-            this.#books[index] = new Book(this.#books[index], title, author, isbn, availability);
+            this.#books[index] = new Book(bookId, title, author, isbn, availability, location, description, genre);
         }
     }
 
     deleteBook(bookID) {
-        this.#books = this.#books.filter(book => book.viewBookDetails().bookId != bookID);
+        this.#books = this.#books.filter(book => book.viewBookDetails().bookId.toString() !== bookID.toString());
     }
 
     /**

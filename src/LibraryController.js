@@ -155,13 +155,17 @@ class CatalogueManagementController {
      */
     handleUpdateBook(event) {
         event.preventDefault();
-        const rowID = event.target.attributes.item(2).value;
+        const rowID = event.target.attributes.getNamedItem('data-row-id').value;
+        const bookId = event.target.attributes.getNamedItem('data-book-id').value;
         const newTitle = document.getElementById(`title-${rowID}`).value;
         const newAuthor = document.getElementById(`author-${rowID}`).value;
         const newISBN = document.getElementById(`isbn-${rowID}`).value;
+        const newLocation = document.getElementById(`location-${rowID}`).value;
+        const newGenre = document.getElementById(`genre-${rowID}`).value;
+        const newDescription = document.getElementById(`description-${rowID}`).value;
         const newAvailability = document.getElementById(`availability-${rowID}`).checked;
-        this.model.updateBook(newTitle, newAuthor, newISBN, newAvailability);
-        const newBook = this.model.getBooks().find(book => book.isbn === newISBN);  
+        this.model.updateBook(bookId, newTitle, newAuthor, newISBN, newGenre, newLocation, newDescription, newAvailability);
+        const newBook = this.model.searchBooks({id: bookId})[0];
         this.view.changeToViewMode(rowID, newBook);
         this.addButtonListeners();
     }

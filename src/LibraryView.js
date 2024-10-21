@@ -355,7 +355,7 @@ class CatalogueManagementView {
                 <label class="form-check-label" for="availability-${rowId}">Available:</label>
               </div>
               
-              <button type="submit" class="btn btn-primary update-book" data-row-id="${rowId}">Update Book</button>
+              <button type="submit" class="btn btn-primary update-book" data-book-id="${book.bookId}" data-row-id="${rowId}">Update Book</button>
               <button type="submit" class="btn btn-danger remove-book" data-book-id="${book.bookId}" data-isbn="${book.isbn}">Remove Book</button>
               </div>
             </form>

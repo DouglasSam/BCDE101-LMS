@@ -40,8 +40,8 @@ class CatalogueManagementModel {
         this.saveBooksToStorage();
     }
 
-    updateBook(title, author, isbn, availability) {
-        this.catalogue.updateBook(isbn, title, author, availability)
+    updateBook(bookId, title, author, isbn, genre, location, description, availability) {
+        this.catalogue.updateBook(bookId, title, author, isbn, genre, location, description, availability)
         this.saveBooksToStorage();
     }
     
