@@ -94,7 +94,6 @@ class Catalogue {
      * @returns {*}
      */
     searchBooks(params) {
-        console.log(params);
         return this.#books.filter(book => book.searchBooks(params)).map(book => book.viewBookDetails());
     }
 

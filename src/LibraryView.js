@@ -158,24 +158,45 @@ class SearchView {
         }
     }
 
-    validSearch(books) {
+    validSearch(results) {
         this.searchTitle.hidden = false;
-        this.searchTitle.innerHTML = `Found ${books.length} books:`;
+        this.searchTitle.innerHTML = `Found ${results.length} books:`;
         this.noResults.hidden = true;
         this.searchResults.hidden = false;
         
         this.bookTableBody.innerHTML = '';
         let count = 1;
-        books.forEach(book => {
+        results.forEach(result => {
             const row = document.createElement('tr');
             row.id = `book-${count++}`;
-            row.innerHTML = `<td>${book.title}</td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.availability ? 'Yes' : 'No'}</td>
-                <td><button class="update-btn" data-isbn="${book.isbn}" data-row-id="${row.id}" >Update</button></td>`
             this.bookTableBody.appendChild(row);
+            this.changeToViewMode(row.id, result);
         });
+    }
+    
+    changeToViewMode(rowId, result) {
+        const row = document.getElementById(rowId);
+        row.innerHTML = `<td>${result.title}</td>
+                <td>${result.author}</td>
+                <td>${result.isbn}</td>
+                <td>${result.availability ? 'Yes' : 'No'}</td>
+                <td><button class="view-details-btn" data-row-id="${row.id}" data-book-id="${result.bookId}" >View Detials/borrow</button></td>`
+    }
+    
+    changeToDetailsMode(rowId, result) {
+        const row = document.getElementById(rowId);
+        row.innerHTML = 
+            `<td colspan="5">
+            <h3>${result.title}</h3>
+            <p><b>Author:</b> ${result.author}</p>
+            <p><b>Genre:</b> ${result.genre}</p>
+            <p><b>ISBN:</b> ${result.isbn}</p>
+            <p><b>Location:</b> ${result.location}</p>
+            <p><b>Description:</b> ${result.description}</p>
+            <p><b>Availability:</b> ${result.availability ? 'Yes' : 'No'}</p>
+            <button class="borrow-btn" data-row-id="${row.id}" data-book-id="${result.bookId}">Borrow</button>
+            <button class="exit-detail-view" data-row-id="${row.id}" data-book-id="${result.bookId}">Exit Detail View</button>
+            </td>`
     }
 
 }
@@ -282,7 +303,7 @@ class CatalogueManagementView {
                 <td>${book.location}</td>
                 <td>${book.availability ? 'Yes' : 'No'}</td>
                 <td>
-                    <button class="update-btn" data-isbn="${book.isbn}" data-row-id="${rowId}">Update</button>
+                    <button class="update-btn" data-book-id="${book.bookId}" data-row-id="${rowId}">Update</button>
                 </td>
             
             

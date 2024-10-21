@@ -15,7 +15,7 @@ describe("Library Management System", () => {
         });
 
         it("should mark the book as unavailable when checked out", () => {
-            book.available = false;  // simulating checkout
+            book.available = false;  // simulating borrow
             expect(book.available).toBe(false);
         });
 

@@ -51,7 +51,7 @@ class CatalogueManagementController {
         let genre = document.getElementById('genre').value;
         let location = document.getElementById('location').value;
         const description = document.getElementById('description').value;
-        console.log(title, author, isbn, genre, location, description);
+        
         if (genre === '') genre = 'N/A';
         if (location === '') location = 'N/A';
         this.model.addBook(title, author, isbn, genre, location, description);
@@ -77,13 +77,12 @@ class CatalogueManagementController {
 
     handleEditBook(event) {
         const rowID = event.target.getAttribute('data-row-id');
-        // TODO Probably need to update when using IDs
-        const isbn = event.target.getAttribute('data-isbn');
-        const book = this.model.getBooks().find(book => book.isbn === isbn);
+        const id = event.target.getAttribute('data-book-id');
+        const book = this.model.searchBooks({id: id})[0];
 
         this.view.changeToEditMode(rowID, book);
         this.addEditUpdateButtonListeners();
-        this.addEditRemoveButtonListeners()
+        this.addEditRemoveButtonListeners();
     }
     
     handleUpdateBook(event) {
@@ -104,7 +103,6 @@ class CatalogueManagementController {
         const id = event.target.attributes.item(2).value;
         const book = this.model.catalogue.searchBooks({id: id})[0];
         
-        console.log(book);
         if (confirm(`Are you sure you want to permanently delete ${book.title} by ${book.author }?`)) {
             this.model.removeBook(id);
             this.view.updateBookTable(this.model.getBooks());
@@ -151,7 +149,6 @@ class BorrowReturnController {
         this.view.render();
         
         const searchToggleButton = document.getElementById("search-toggle");
-        console.log(searchToggleButton)
         
         searchToggleButton.addEventListener('click', this.toggleSearchForm.bind(this))
     }
@@ -177,16 +174,60 @@ class SearchController {
         const searchToggleButton = document.getElementById("search-toggle");
 
         searchToggleButton.addEventListener('click', this.toggleSearchForm.bind(this));
-        this.handleAddSearchButtonListener()
+        this.handleButtonListeners()
     }
 
-    handleAddSearchButtonListener() {
+    /**
+     * Handles all the button listeners for the page
+     */
+    handleButtonListeners() {
+        const updateButtons = document.querySelectorAll('.view-details-btn');
+        updateButtons.forEach(button => {
+            button.addEventListener('click', this.handleViewDetails.bind(this));
+        });
+
+        const ExitDetailViewButtons = document.querySelectorAll('.exit-detail-view');
+        ExitDetailViewButtons.forEach(button => {
+            button.addEventListener('click', this.handleExitDetailView.bind(this));
+        });
+
+        const borrowButtons = document.querySelectorAll('.borrow-btn');
+        borrowButtons.forEach(button => {
+            button.addEventListener('click', this.handleBorrow.bind(this));
+        });
+
         if (this.model.searchMode === 'simple') {
             document.getElementById('simple-search-form').addEventListener('submit', this.handleSimpleSearch.bind(this));
         }
         else {
             document.getElementById('complex-search-form').addEventListener('submit', this.handleComplexSearch.bind(this));
         }
+    }
+    
+    
+    /**
+     * Will return the details view back to the list view
+     */
+    handleExitDetailView(event) {
+        const id = event.target.getAttribute('data-book-id');
+        const rowId = event.target.getAttribute('data-row-id');
+        const book = this.model.searchBooks({id: id})[0];
+        this.view.changeToViewMode(rowId, book);
+        this.handleButtonListeners()
+    }
+    
+    handleViewDetails(event) {
+        const id = event.target.getAttribute('data-book-id');
+        const rowId = event.target.getAttribute('data-row-id');
+        const book = this.model.searchBooks({id: id})[0];
+        this.view.changeToDetailsMode(rowId, book);
+        this.handleButtonListeners()
+        
+    }
+    
+    handleBorrow() {
+        //TODO
+        console.log("Borrowing book");
     }
 
     toggleSearchForm(event) {
@@ -198,7 +239,7 @@ class SearchController {
         else {
             this.view.complexSearch();
         }
-        this.handleAddSearchButtonListener();
+        this.handleButtonListeners();
     }
 
     handleSimpleSearch(event) {
@@ -210,6 +251,7 @@ class SearchController {
         }
         else {
             this.view.validSearch(searchResults);
+            this.handleButtonListeners();
         }
         
     }
@@ -237,6 +279,7 @@ class SearchController {
         }
         else {
             this.view.validSearch(searchResults);
+            this.handleButtonListeners();
         }
     }
 }
