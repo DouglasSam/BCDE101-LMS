@@ -33,20 +33,21 @@ class SearchView {
         document.getElementById("main").innerHTML =`
             <h2>Search our catalogue</h2>
             <h3>${numBooks} books available to search through.</h3>
-            <p>Use form below to get searching</p>
+            <p>Use form below to get searching<br>
+            Just press search in simple mode to return all books</p>
             <a id="search-toggle" href="#"></a>
             <div id="search-form"></div>
             <h2 id="no-results-found" hidden></h2>
             <div id="search-results" hidden>
                 <h2 id="search-title"></h2>
-                <table id="book-table">
+                <table id="book-table" class="table table-striped">
                     <thead>
                         <tr>
                             <th>Title</th>
                             <th>Author</th>
                             <th>ISBN</th>
                             <th>Available</th>
-                            <th>Action</th>
+                            <th>View Details</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -55,43 +56,90 @@ class SearchView {
                 </table>
             </div>
             `
-        searchMode === "simple" ? this.simpleSearch() : this.complexSearch();
+        
         this.noResults = document.getElementById("no-results-found");
         this.searchResults = document.getElementById("search-results");
+        this.searchTitle = document.getElementById("search-title");
         this.bookTableBody = document.querySelector('#book-table tbody');
+        searchMode === "simple" ? this.simpleSearch() : this.complexSearch();
     }
 
     simpleSearch() {
+        this.searchResults.hidden = true;
         document.getElementById("search-toggle").innerHTML = "Go to Complex Search Mode"
         document.getElementById("search-form").innerHTML =
             '<h3>Enter Search Term</h3>' +
             `
             <form id="simple-search-form">
-            <input type="text" class="w-100-20px" id="simple-search-input" placeholder="Search by title, author or isbn">
-            <button type="submit">Search</button>
+              <div class="mb-3 d-flex gap-3 align-items-center">
+              <div>
+                <label for="simple-search-input" class="form-label">Search by title, author or isbn:</label>
+                </div>
+                <div class="flex-fill">
+                <input type="text" class="form-control" id="simple-search-input" placeholder="Search by title, author or isbn">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+              </div>
+              
             </form>
             `;
 
     }
 
     complexSearch() {
+        this.searchResults.hidden = true;
         document.getElementById("search-toggle").innerHTML = "Go to Simple Search Mode"
         document.getElementById("search-form").innerHTML =
             '<h3>Enter Search Fields</h3>' +
-            `<form id="complex-search-form">
-                <label for="title">Title of Book:</label>
-                <input id="title" type="text" placeholder="Title">
-                <label for="author">Author of Book:</label>
-                <input id="author" type="text" placeholder="Author"> 
-                <label for="isbn">ISBN of Book:</label>
-                <input id="isbn" type="text" placeholder="ISBN"> 
-                <label for="search-available">Only Search Available:</label>
-                <input id="search-available" type="checkbox"> 
-                <button type="submit">Search</button>
+            `<p>Insert any terms into any of the below options and results will find all books where your query if found in that field<br>
+            Leave fields blank if you do not want to search by that field. All are optional, at least one must be filled or selected.</p>    
+            <form id="complex-search-form">
+              <div class="mb-1">
+                <label for="title" class="form-label">Book Title:</label>
+                <input type="text" class="form-control" id="title" placeholder="Book Title"  >
+              </div>
+              
+              <div class="d-flex align-items-center gap-3 mb-1">
+                  <div class="flex-fill">
+                    <label for="author" class="form-label">Author:</label>
+                    <input type="text" class="form-control" id="author" placeholder="Author"  >
+                  </div>
+              
+                  <div class="flex-fill">
+                    <label for="isbn" class="form-label">ISBN:</label>
+                    <input type="text" class="form-control" id="isbn" placeholder="ISBN"  >
+                  </div>
+              </div>
+                  
+              <div class="d-flex align-items-center gap-3 mb-1">
+                  <div class="flex-fill">
+                    <label for="genre" class="form-label">Genre:</label>
+                    <input type="text" class="form-control" id="genre" placeholder="Genre" >
+                  </div>
+                           
+                  <div class="flex-fill">
+                    <label for="location" class="form-label">Location:</label>
+                    <input type="text" class="form-control" id="location" placeholder="Location" >
+                  </div>
+              </div>
+              
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <input class="form-control" id="description" placeholder="Description">
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input id="search-available" type="checkbox" class="form-check-input">
+                    <label for="search-available" class="form-check-label">Only Search, or List all, Available Books:</label>
+                </div>
+                
+              <button type="submit" class="btn btn-primary">Search For Book</button>
+
             </form>`;
     }
 
     noBookFoundSearch(title, author, isbn, onlyAvailable=false) {
+        this.searchResults.hidden = true;
         this.noResults.hidden = false;
         this.searchResults.hidden = true;
         if (!title && !author && !isbn) {
@@ -111,8 +159,11 @@ class SearchView {
     }
 
     validSearch(books) {
+        this.searchTitle.hidden = false;
+        this.searchTitle.innerHTML = `Found ${books.length} books:`;
         this.noResults.hidden = true;
         this.searchResults.hidden = false;
+        
         this.bookTableBody.innerHTML = '';
         let count = 1;
         books.forEach(book => {

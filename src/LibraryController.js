@@ -63,7 +63,7 @@ class CatalogueManagementController {
 
     handleSearch() {
         const query = this.searchInput.value;
-        const filteredBooks = this.model.searchBooks({query: query} );
+        const filteredBooks = this.model.searchBooks({query: query});
         this.view.updateBookTable(filteredBooks);
         this.addUpdateButtonListeners();
     }
@@ -204,7 +204,7 @@ class SearchController {
     handleSimpleSearch(event) {
         event.preventDefault();
         const query = document.getElementById('simple-search-input').value;
-        const searchResults = this.model.searchBooks(query, query, query);
+        const searchResults = this.model.searchBooks({query: query});
         if (searchResults.length === 0) {
             this.view.noBookFoundSearch(query, query, query);
         }
@@ -219,8 +219,19 @@ class SearchController {
         const title = document.getElementById('title').value;
         const author = document.getElementById('author').value;
         const isbn = document.getElementById('isbn').value;
+        const genre = document.getElementById('genre').value
+        const location = document.getElementById('location').value;
+        const description = document.getElementById('description').value;
         const availableOnly = document.getElementById('search-available').checked;
-        const searchResults = this.model.searchBooks(title, author, isbn, availableOnly);
+        // console.log(title, author, isbn, genre, location, description, availableOnly);
+        const searchResults = this.model.searchBooks({
+            title: title ? title : false, 
+            author: author ? author : false, 
+            isbn: isbn ? isbn : false, 
+            genre: genre ? genre : false, 
+            location: location ? location : false, 
+            description: description ? description : false,
+            availableOnly: availableOnly});
         if (searchResults.length === 0) {
             this.view.noBookFoundSearch(title, author, isbn, availableOnly);
         }
@@ -242,8 +253,8 @@ class HomeController {
 }
 
 const controllers = new Map();
-// On Load
 
+// On Load
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Document Loaded");
     const catalogue = new Catalogue();

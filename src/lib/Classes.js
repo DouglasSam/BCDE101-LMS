@@ -22,30 +22,32 @@ class Book {
 
     searchBooks({ query = false, id = false, title = false, author = false, isbn = false, genre = false, location = false, description = false, availableOnly = false } = {}) {
         // console.log(id, this.#bookId);
-        if (query) {
+        if (query !== false) {
             return this.#title.toLowerCase().includes(query.toLowerCase()) ||
                 this.#author.toLowerCase().includes(query.toLowerCase()) ||
-                this.#description.toLowerCase().includes(query.toLowerCase());
+                this.#isbn.toString().includes(query.toString());
         }
         if (availableOnly && this.#availability === false) return false;
         
         const searchResults = [];
         if (id !== false) {
-            searchResults.push(this.#bookId == id);
+            searchResults.push(this.#bookId.toString() === id.toString());
         }
         if (title !== false)
             searchResults.push(this.#title.toLowerCase().includes(title.toLowerCase()));
         if (author !== false)
             searchResults.push(this.#author.toLowerCase().includes(author.toLowerCase()));
         if (isbn !== false)
-            searchResults.push(this.#isbn == isbn);
+            searchResults.push(this.#isbn.toString().includes(isbn.toString()));
         if (genre !== false)
             searchResults.push(this.#genre.toLowerCase().includes(genre.toLowerCase()));
         if (location !== false)
             searchResults.push(this.#location.toLowerCase().includes(location.toLowerCase()));
         if (description !== false)
             searchResults.push(this.#description.toLowerCase().includes(description.toLowerCase()));
-
+        if (availableOnly !== false)
+            searchResults.push(this.#availability);
+        if (searchResults.length === 0) return false;
        return searchResults.every(result => result);
     }
 
@@ -92,7 +94,7 @@ class Catalogue {
      * @returns {*}
      */
     searchBooks(params) {
-        // console.log(params);
+        console.log(params);
         return this.#books.filter(book => book.searchBooks(params)).map(book => book.viewBookDetails());
     }
 

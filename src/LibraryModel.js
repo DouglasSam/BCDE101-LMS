@@ -81,8 +81,8 @@ class SearchModel {
         sessionStorage.setItem('searchMode', this.searchMode);
     }
     
-    searchBooks(title, author, isbn, availableOnly=false) {
-        return this.catalogue.searchBooks(title, author, isbn, availableOnly);
+    searchBooks(params) {
+        return this.catalogue.searchBooks(params);
     }
 
     getBooks() {
