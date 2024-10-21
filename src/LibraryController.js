@@ -1,4 +1,10 @@
-// Controller: Handles user input and updates Model/View
+/**
+ * Class that handled the management of the catalogue
+ * The management of the catalogue includes adding, updating, and removing books
+ * It also has a search function to search for books in the catalogue to make updating one book easier
+ * It also has a reset function to reset the books in the catalogue to the starting data set
+ * It also has a clear function to clear all books from the catalogue
+ */
 class CatalogueManagementController {
     
     constructor(model, view) {
@@ -155,6 +161,9 @@ class CatalogueManagementController {
     
 }
 
+/**
+ * Class that handles the users of the library
+ */
 class UserManagementController {
     
     constructor(model, view) {
@@ -168,6 +177,9 @@ class UserManagementController {
     
 }
 
+/**
+ * Class that handles the return of books
+ */
 class ReturnController {
 
     constructor(model, view) {
@@ -188,6 +200,13 @@ class ReturnController {
     }
 }
 
+/**
+ * Class that handles searching of the catalogue
+ * Gives user the option to use a simple search query or complex 
+ *      allowing for searching in the different sections of the book or only available books
+ * Allows users to view all details about the book handles the borrowing of books
+ * 
+ */
 class SearchController {
     
     constructor(model, view) {
@@ -335,6 +354,9 @@ class SearchController {
     }
 }
 
+/**
+ * Class that handles the home page, no logic just a view
+ */
 class HomeController {
     
     constructor(view) {
@@ -349,7 +371,7 @@ class HomeController {
 // Map of the different controllers to a string key
 const controllers = new Map();
 
-// On Load
+// On Load sets up the MVC groups of page loads last page if in the same session
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Document Loaded");
     const catalogue = new Catalogue();
