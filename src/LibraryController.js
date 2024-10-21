@@ -26,17 +26,21 @@ class CatalogueManagementController {
     
     handleResetBooks(event) {
         event.preventDefault();
-        this.model.clearAllBooks();
-        this.view.updateBookTable(this.model.getBooks());
+        if (confirm(`Are you sure you want to permanently delete ALL books?`)) {
+            this.model.clearAllBooks();
+            this.view.updateBookTable(this.model.getBooks());
+        }
     }
 
     handleLoadBooksFromDataSet(event) {
         event.preventDefault();
-        this.model.clearAllBooks();
-        this.model.resetBooksFromDataSet().then(() => {
-            this.view.updateBookTable(this.model.getBooks());
-            this.addUpdateButtonListeners();
-        });
+        if (confirm(`Are you sure you want to replace ALL books with those defined in the starting data set?`)) {
+            this.model.clearAllBooks();
+            this.model.resetBooksFromDataSet().then(() => {
+                this.view.updateBookTable(this.model.getBooks());
+                this.addUpdateButtonListeners();
+            });
+        }
     }
     
     handleAddBook(event) {
@@ -44,8 +48,13 @@ class CatalogueManagementController {
         const title = document.getElementById('title').value;
         const author = document.getElementById('author').value;
         const isbn = document.getElementById('isbn').value;
-        
-        this.model.addBook(title, author, isbn);
+        let genre = document.getElementById('genre').value;
+        let location = document.getElementById('location').value;
+        const description = document.getElementById('description').value;
+        console.log(title, author, isbn, genre, location, description);
+        if (genre === '') genre = 'N/A';
+        if (location === '') location = 'N/A';
+        this.model.addBook(title, author, isbn, genre, location, description);
 
         this.view.clearForm();
         this.view.updateBookTable(this.model.getBooks());
@@ -92,11 +101,12 @@ class CatalogueManagementController {
     
     handleRemoveBook(event) {
         event.preventDefault();
-        const isbn = event.target.attributes.item(2).value;
-        const book = this.model.searchBooks(isbn)[0]
+        const id = event.target.attributes.item(2).value;
+        const book = this.model.catalogue.searchBooks({id: id})[0];
+        
+        console.log(book);
         if (confirm(`Are you sure you want to permanently delete ${book.title} by ${book.author }?`)) {
-            // TODO update when using id
-            this.model.removeBook(isbn);
+            this.model.removeBook(id);
             this.view.updateBookTable(this.model.getBooks());
             this.addUpdateButtonListeners();
         }

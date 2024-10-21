@@ -13,18 +13,40 @@ class Book {
         this.#bookId = bookId;
         this.#title = title;
         this.#author = author;
-        this.#genre = genre;
         this.#isbn = isbn;
-        this.#availability = availability;
+        this.#genre = genre;
         this.#location = location;
         this.#description = description;
+        this.#availability = availability;
     }
 
-    searchBooks(title, author, isbn, availableOnly=false) {
+    searchBooks({ query = false, id = false, title = false, author = false, isbn = false, genre = false, location = false, description = false, availableOnly = false } = {}) {
+        // console.log(id, this.#bookId);
+        if (query) {
+            return this.#title.toLowerCase().includes(query.toLowerCase()) ||
+                this.#author.toLowerCase().includes(query.toLowerCase()) ||
+                this.#description.toLowerCase().includes(query.toLowerCase());
+        }
         if (availableOnly && this.#availability === false) return false;
-        if (title) return this.#title.toLowerCase().includes(title.toLowerCase());
-        if (author) return this.#author.toLowerCase().includes(author.toLowerCase());
-        if (isbn) return this.#isbn === isbn;
+        
+        const searchResults = [];
+        if (id !== false) {
+            searchResults.push(this.#bookId == id);
+        }
+        if (title !== false)
+            searchResults.push(this.#title.toLowerCase().includes(title.toLowerCase()));
+        if (author !== false)
+            searchResults.push(this.#author.toLowerCase().includes(author.toLowerCase()));
+        if (isbn !== false)
+            searchResults.push(this.#isbn == isbn);
+        if (genre !== false)
+            searchResults.push(this.#genre.toLowerCase().includes(genre.toLowerCase()));
+        if (location !== false)
+            searchResults.push(this.#location.toLowerCase().includes(location.toLowerCase()));
+        if (description !== false)
+            searchResults.push(this.#description.toLowerCase().includes(description.toLowerCase()));
+
+       return searchResults.every(result => result);
     }
 
     viewBookDetails() {
@@ -48,8 +70,8 @@ class Catalogue {
         this.#books = [];
     }
 
-    addBook(title, author, isbn, availability = true) {
-        this.#books.push(new Book(this.#books.length, title, author, isbn, availability));
+    addBook(id, title, author, isbn, availability = true, location = "Library", description = "", genre = "undefined", ) {
+        this.#books.push(new Book(id, title, author, isbn, availability, location, description, genre));
     }
 
     // TODO update using ID
@@ -60,12 +82,18 @@ class Catalogue {
         }
     }
 
-    deleteBook(isbn) {
-        this.#books = this.#books.filter(book => book.viewBookDetails().isbn !== isbn);
+    deleteBook(bookID) {
+        this.#books = this.#books.filter(book => book.viewBookDetails().bookId != bookID);
     }
 
-    searchBooks(title, author, isbn, availableOnly=false) {
-        return this.#books.filter(book => book.searchBooks(title, author, isbn, availableOnly)).map(book => book.viewBookDetails());
+    /**
+     * 
+     * @param params Object that contains search queries, for example searching for id you would pass in { id: id } and searching for multiple queries you would pass in { id: id, title: title } etc.
+     * @returns {*}
+     */
+    searchBooks(params) {
+        // console.log(params);
+        return this.#books.filter(book => book.searchBooks(params)).map(book => book.viewBookDetails());
     }
 
     getBooks() {

@@ -3,6 +3,9 @@
 
 // Model: Manages data logic and storage
 class CatalogueManagementModel {
+
+    #maxBookId = 0;
+
     constructor(catalogue) {
         this.catalogue = catalogue;
         this.loadBooksFromStorage();
@@ -19,22 +22,21 @@ class CatalogueManagementModel {
         if (bookFetch.ok) {
             books = await bookFetch.json();
         }
-        // console.log(books[0]);
-        books.forEach(book => this.addBook(book.title, book.author, book.isbn, book.available));
+        books.forEach(book => this.addBook(book.title, book.author, book.isbn, book.genre, book.location, book.description, book.available));
     }
 
     loadBooksFromStorage() {
         let booksJSON = localStorage.getItem('library_books');
         let books = booksJSON ? JSON.parse(booksJSON) : [];
-        books.forEach(book => this.addBook(book.title, book.author, book.isbn, book.availability));
+        books.forEach(book => this.addBook(book.title, book.author, book.isbn, book.genre, book.location, book.description, book.availability));
     }
 
     saveBooksToStorage() {
         localStorage.setItem('library_books', JSON.stringify(this.catalogue.getBooks()));
     }
 
-    addBook(title, author, isbn, availability = true) {
-        this.catalogue.addBook(title, author, isbn, availability);
+    addBook(title, author, isbn, genre, location, description, availability = true) {
+        this.catalogue.addBook(this.#maxBookId++, title, author, isbn, availability, location, description, genre);
         this.saveBooksToStorage();
     }
 
@@ -43,15 +45,15 @@ class CatalogueManagementModel {
         this.saveBooksToStorage();
     }
     
-    removeBook(isbn) {
-        this.catalogue.deleteBook(isbn);
+    removeBook(id) {
+        this.catalogue.deleteBook(id);
         this.saveBooksToStorage();
     }
 
     searchBooks(query) {
-        return this.catalogue.searchBooks(query, query, query);
+        return this.catalogue.searchBooks(query);
     }
-
+    
     getBooks() {
         return this.catalogue.getBooks();
     }

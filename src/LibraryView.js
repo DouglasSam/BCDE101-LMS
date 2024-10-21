@@ -60,10 +60,10 @@ class SearchView {
         this.searchResults = document.getElementById("search-results");
         this.bookTableBody = document.querySelector('#book-table tbody');
     }
-    
+
     simpleSearch() {
         document.getElementById("search-toggle").innerHTML = "Go to Complex Search Mode"
-        document.getElementById("search-form").innerHTML = 
+        document.getElementById("search-form").innerHTML =
             '<h3>Enter Search Term</h3>' +
             `
             <form id="simple-search-form">
@@ -71,26 +71,26 @@ class SearchView {
             <button type="submit">Search</button>
             </form>
             `;
-        
+
     }
-    
+
     complexSearch() {
         document.getElementById("search-toggle").innerHTML = "Go to Simple Search Mode"
         document.getElementById("search-form").innerHTML =
             '<h3>Enter Search Fields</h3>' +
             `<form id="complex-search-form">
-                <label for="title">Title of Book</label>
+                <label for="title">Title of Book:</label>
                 <input id="title" type="text" placeholder="Title">
-                <label for="author">Author of Book</label>
+                <label for="author">Author of Book:</label>
                 <input id="author" type="text" placeholder="Author"> 
-                <label for="isbn">ISBN of Book</label>
+                <label for="isbn">ISBN of Book:</label>
                 <input id="isbn" type="text" placeholder="ISBN"> 
-                <label for="search-available">Only Search Available</label>
+                <label for="search-available">Only Search Available:</label>
                 <input id="search-available" type="checkbox"> 
                 <button type="submit">Search</button>
             </form>`;
     }
-    
+
     noBookFoundSearch(title, author, isbn, onlyAvailable=false) {
         this.noResults.hidden = false;
         this.searchResults.hidden = true;
@@ -109,7 +109,7 @@ class SearchView {
             this.noResults.innerHTML = innerHTML;
         }
     }
-    
+
     validSearch(books) {
         this.noResults.hidden = true;
         this.searchResults.hidden = false;
@@ -131,7 +131,7 @@ class SearchView {
 
 class CatalogueManagementView {
 
-    render() {
+    render(numBooks = 0) {
         document.getElementById("main").innerHTML =
             `
         <h2>Add a Book</h2>
@@ -141,25 +141,61 @@ class CatalogueManagementView {
         </ul>
         <h2>Enter New Book Details</h2>
         <form id="book-form">
-            <input type="text" class="w-100-20px" id="title" placeholder="Book Title" required><br>
-            <input type="text" class="w-100-20px" id="author" placeholder="Author" required><br>
-            <input type="text" class="w-100-20px" id="isbn" placeholder="ISBN" required><br>
-            <button type="submit">Add Book</button>
-        </form>
+              <div class="mb-3">
+                <label for="title" class="form-label">Book Title:</label>
+                <input type="text" class="form-control" id="title" placeholder="Book Title" required >
+              </div>
+              
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="author" class="form-label">Author:</label>
+                    <input type="text" class="form-control" id="author" placeholder="Author" required >
+                  </div>
+              
+                  <div class="flex-fill">
+                    <label for="isbn" class="form-label">ISBN:</label>
+                    <input type="text" class="form-control" id="isbn" placeholder="ISBN" required >
+                  </div>
+              </div>
+                  
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="genre" class="form-label">Genre:</label>
+                    <input type="text" class="form-control" id="genre" placeholder="Genre (Optional)" >
+                  </div>
+                           
+                  <div class="flex-fill">
+                    <label for="location" class="form-label">Location:</label>
+                    <input type="text" class="form-control" id="location" placeholder="Location (Optional)" >
+                  </div>
+              </div>
+              
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea class="form-control" id="description" placeholder="Description (Optional)" rows="5"></textarea>
+                </div>
+              
+              <button type="submit" class="btn btn-primary">Add Book</button>
+
+            </form>
 
         <h2>Search Books</h2>
         <input type="text" id="search" placeholder="Search by title or author">
         
         <h2>Books in Library</h2>
-        <table id="book-table">
+        <h3 id="num-books"></h3>
+        <table id="book-table" class="table table-striped">
             <thead>
                 <tr>
 <!--                TODO add book id-->
                     <th>Title</th>
                     <th>Author</th>
                     <th>ISBN</th>
+                    <th>Genre</th>
+                    <th>Location</th>
                     <th>Available</th>
                     <th>Action</th>
+                  
                 </tr>
             </thead>
             <tbody>
@@ -168,9 +204,11 @@ class CatalogueManagementView {
         </table>
             `
         this.bookTableBody = document.querySelector('#book-table tbody');
+        this.bookCount = document.getElementById('num-books');
     }
 
     updateBookTable(books) {
+        this.bookCount.innerHTML = `There are ${books.length} in the library at the moment`;
         this.bookTableBody.innerHTML = '';
         let count = 1;
         books.forEach(book => {
@@ -183,29 +221,74 @@ class CatalogueManagementView {
     }
 
     changeToViewMode(rowId, book) {
-        document.getElementById(rowId).innerHTML = 
-              //  TODO add book id-->
-                `<td>${book.title}</td>
+        document.getElementById(rowId).innerHTML =
+            //  TODO add book id-->
+            `
+                <td>${book.title}</td>
                 <td>${book.author}</td>
                 <td>${book.isbn}</td>
+                <td>${book.genre}</td>
+                <td>${book.location}</td>
                 <td>${book.availability ? 'Yes' : 'No'}</td>
-                <td><button class="update-btn" data-isbn="${book.isbn}" data-row-id="${rowId}" >Update</button></td>
+                <td>
+                    <button class="update-btn" data-isbn="${book.isbn}" data-row-id="${rowId}">Update</button>
+                </td>
+            
+            
                 `
     }
-    
+
     changeToEditMode(rowId, book) {
         document.getElementById(rowId).innerHTML = `
-        <form id="book-form-${rowId}">
-            <td><textarea id="title-${rowId}" placeholder="Book Title"  required>${book.title}</textarea></td>
-            <td><textarea id="author-${rowId}" placeholder="Author" required>${book.author}</textarea></td>
-<!--            TODO update from disabled when using book id to identify books-->
-            <td><textarea id="isbn-${rowId}" placeholder="ISBN" required disabled>${book.isbn}</textarea></td> 
-            <td><input type="checkbox" id="availability-${rowId}" ${book.availability ? "checked" : ""}></td>
-            <td><button class="update" type="submit" data-row-id="${rowId}">Update Book</button>
-            <button class="remove" type="submit" data-isbn="${book.isbn}">Remove Book</button></td>
-        </form>`
+        <td colspan="7">
+            <form id="book-form-${rowId}">
+              <div class="mb-3">
+                <label for="title-${rowId}" class="form-label">Book Title:</label>
+                <input type="text" class="form-control" id="title-${rowId}" placeholder="Book Title" required value="${book.title}">
+              </div>
+              
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="author-${rowId}" class="form-label">Author:</label>
+                    <input type="text" class="form-control" id="author-${rowId}" placeholder="Author" required value="${book.author}">
+                  </div>
+              
+                  <div class="flex-fill">
+                    <label for="isbn-${rowId}" class="form-label">ISBN:</label>
+                    <input type="text" class="form-control" id="isbn-${rowId}" placeholder="ISBN" required value="${book.isbn}">
+                  </div>
+              </div>
+                  
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="genre-${rowId}" class="form-label">Genre:</label>
+                    <input type="text" class="form-control" id="genre-${rowId}" placeholder="Genre (Optional)" value="${book.genre}">
+                  </div>
+                           
+                  <div class="flex-fill">
+                    <label for="location-${rowId}" class="form-label">Location:</label>
+                    <input type="text" class="form-control" id="location-${rowId}" placeholder="Location (Optional)" value="${book.location}">
+                  </div>
+              </div>
+              
+                <div class="mb-3">
+                    <label for="description-${rowId}" class="form-label">Description:</label>
+                    <textarea class="form-control" id="description-${rowId}" placeholder="Description (Optional)" rows="${Math.ceil(book.description.length / 100)}">${book.description}</textarea>
+                </div>
+              
+              <div class="d-flex align-items-center justify-content-between gap-3">
+              <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="availability-${rowId}" ${book.availability ? "checked" : ""}>
+                <label class="form-check-label" for="availability-${rowId}">Available:</label>
+              </div>
+              
+              <button type="submit" class="btn btn-primary update" data-row-id="${rowId}">Update Book</button>
+              <button type="submit" class="btn btn-danger remove" data-book-id="${book.bookId}" data-isbn="${book.isbn}">Remove Book</button>
+              </div>
+            </form>
+        </td>`
     }
-    
+
     clearForm() {
         document.getElementById('book-form').reset();
     }
