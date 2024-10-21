@@ -18,7 +18,7 @@ class UserManagementView {
 
 }
 
-class BorrowReturnView {
+class ReturnView {
 
     render() {
         document.getElementById("main").innerHTML =
@@ -138,6 +138,7 @@ class SearchView {
             </form>`;
     }
 
+    //TODO update
     noBookFoundSearch(title, author, isbn, onlyAvailable=false) {
         this.searchResults.hidden = true;
         this.noResults.hidden = false;
@@ -354,8 +355,8 @@ class CatalogueManagementView {
                 <label class="form-check-label" for="availability-${rowId}">Available:</label>
               </div>
               
-              <button type="submit" class="btn btn-primary update" data-row-id="${rowId}">Update Book</button>
-              <button type="submit" class="btn btn-danger remove" data-book-id="${book.bookId}" data-isbn="${book.isbn}">Remove Book</button>
+              <button type="submit" class="btn btn-primary update-book" data-row-id="${rowId}">Update Book</button>
+              <button type="submit" class="btn btn-danger remove-book" data-book-id="${book.bookId}" data-isbn="${book.isbn}">Remove Book</button>
               </div>
             </form>
         </td>`

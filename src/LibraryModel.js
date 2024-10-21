@@ -64,7 +64,7 @@ class UserManagementModel {
     
 }
 
-class BorrowReturnModel {
+class ReturnModel {
 
 }
 

@@ -168,7 +168,7 @@ class UserManagementController {
     
 }
 
-class BorrowReturnController {
+class ReturnController {
 
     constructor(model, view) {
         this.model = model;
@@ -181,7 +181,6 @@ class BorrowReturnController {
     }
 
     toggleSearchForm(event) {
-        console.log("in this event")
         event.preventDefault();
         this.model.toggleSearchMode();
         if (this.model.searchMode === 'simple') this.view.simpleSearch();
@@ -318,7 +317,6 @@ class SearchController {
         const location = document.getElementById('location').value;
         const description = document.getElementById('description').value;
         const availableOnly = document.getElementById('search-available').checked;
-        // console.log(title, author, isbn, genre, location, description, availableOnly);
         const searchResults = this.model.searchBooks({
             title: title ? title : false, 
             author: author ? author : false, 
@@ -357,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const catalogue = new Catalogue();
     controllers.set('user-management', new UserManagementController(new UserManagementModel(), new UserManagementView()));
     controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(catalogue), new CatalogueManagementView()));
-    controllers.set('borrow-or-return', new BorrowReturnController(new BorrowReturnModel(), new BorrowReturnView()));
+    controllers.set('return-books', new ReturnController(new ReturnModel(), new ReturnView()));
     controllers.set('catalogue-search', new SearchController(new SearchModel(catalogue), new SearchView()));
     controllers.set('home', new HomeController(new HomeView()));
     let currentPage = sessionStorage.getItem('currentPage');
@@ -376,14 +374,19 @@ function loadPage(id, event) {
     if (event) {
         event.preventDefault();
     }
-    console.log(event)
     console.log("Loading page: " + id);
+    const navLinks = document.getElementById("nav").getElementsByTagName('a');
+    for (let i = 0; i < navLinks.length; i++) {
+        navLinks[i].classList.remove('active');
+    }
     let controller = controllers.get(id);
     if (!controller) {
         console.error("Controller not found for page: " + id);
         controllers.get('home').setCurrentView();
         id = 'home';
     }
+    if (id !== "home")
+        document.getElementById(id).classList.add('active');
     controller.setCurrentView();
     sessionStorage.setItem('currentPage', id);
 }
