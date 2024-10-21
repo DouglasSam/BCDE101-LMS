@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel='stylesheet' href='Stylesheet.css'>
+<!--    <link rel='stylesheet' href='Stylesheet.css'>-->
 
     <title>Library Management System</title>
 
@@ -15,25 +15,32 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </head>
-<body>
-    <div class="container">
-        <h1><a href="#" onclick="loadPage('home', event)">Library Management System</a></h1>
+<body class="d-flex flex-column h-100">
+    <header class="container flex-shrink-0">
+        <h1 class="display-3 fw-bold text-center"><a class="  text-decoration-none link-dark"  href="#" onclick="loadPage('home', event)">Library Management System</a></h1>
+    </header>
 
-        <nav>
-            <ul>
-                <li><a href="#" onclick="loadPage('user-management', event)">User Management</a></li>
-                <li><a href="#" onclick="loadPage('catalogue-management', event)">Catalogue Management</a></li>
-                <li><a href="#" onclick="loadPage('borrow-or-return', event)">Borrow or Return Books</a></li>
-                <li><a href="#" onclick="loadPage('catalogue-search', event)">Catalogue Search</a></li>
+        <nav class="">
+            <ul class="nav nav-tabs flex-column flex-md-row justify-content-center align-content-center text-center">
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="loadPage('user-management', event)">User Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="loadPage('catalogue-management', event)">Catalogue Management</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="loadPage('borrow-or-return', event)">Borrow or Return Books</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" onclick="loadPage('catalogue-search', event)">Catalogue Search</a>
+              </li>
             </ul>
         </nav>
 
-        <main id="main">
+    <main id="main" class="flex-shrink-0 container">
 
-        </main>
-
-    </div>
-    <footer id="footer" class="footer py-3 bg-light mt-3">
+    </main>
+    <footer id="footer" class="footer mt-auto py-3 bg-light">
         <div class="d-flex justify-content-between gap-md-3 mx-3 flex-column flex-md-row text-center">
             <p>&copy; Samuel Douglas, 2024</p>
             <p>BCDE102 Library Management System </p>
