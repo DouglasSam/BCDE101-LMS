@@ -78,6 +78,20 @@ class CatalogueManagementController {
         updateButtons.forEach(button => {
             button.addEventListener('click', this.handleEditBook.bind(this));
         });
+
+        const cancelEditButtons = document.querySelectorAll('.cancel-edit');
+        cancelEditButtons.forEach(button => {
+            button.addEventListener('click', this.handleCancelEdit.bind(this));
+        });
+    }
+    
+    handleCancelEdit(event) {
+        event.preventDefault();
+        const rowID = event.target.attributes.getNamedItem('data-row-id').value;
+        const bookId = event.target.attributes.getNamedItem('data-book-id').value;
+        const book = this.model.searchBooks({id: bookId})[0];
+        this.view.SetToRowMode(rowID, book);
+        this.addButtonListeners();
     }
 
     /**
@@ -148,7 +162,7 @@ class CatalogueManagementController {
         const id = event.target.getAttribute('data-book-id');
         const book = this.model.searchBooks({id: id})[0];
 
-        this.view.changeToEditMode(rowID, book);
+        this.view.setToEditMode(rowID, book);
         this.addButtonListeners();
     }
 
@@ -169,7 +183,7 @@ class CatalogueManagementController {
         const newAvailability = document.getElementById(`availability-${rowID}`).checked;
         this.model.updateBook(bookId, newTitle, newAuthor, newISBN, newGenre, newLocation, newDescription, newAvailability);
         const newBook = this.model.searchBooks({id: bookId})[0];
-        this.view.changeToViewMode(rowID, newBook);
+        this.view.SetToRowMode(rowID, newBook);
         this.addButtonListeners();
     }
 
@@ -308,7 +322,7 @@ class SearchController {
         const id = event.target.getAttribute('data-book-id');
         const rowId = event.target.getAttribute('data-row-id');
         const book = this.model.searchBooks({id: id})[0];
-        this.view.changeToViewMode(rowId, book);
+        this.view.setToNormalRowMode(rowId, book);
         this.handleButtonListeners()
     }
 
@@ -320,7 +334,7 @@ class SearchController {
         const id = event.target.getAttribute('data-book-id');
         const rowId = event.target.getAttribute('data-row-id');
         const book = this.model.searchBooks({id: id})[0];
-        this.view.changeToDetailsMode(rowId, book);
+        this.view.SetToDetailsRowMode(rowId, book);
         this.handleButtonListeners()
         
     }
@@ -361,7 +375,7 @@ class SearchController {
         const query = document.getElementById('simple-search-input').value;
         const searchResults = this.model.searchBooks({query: query});
         if (searchResults.length === 0) {
-            this.view.noBookFoundSearch(query, query, query);
+            this.view.noBookFoundSearch();
         }
         else {
             this.view.validSearch(searchResults);
@@ -392,7 +406,7 @@ class SearchController {
             description: description ? description : false,
             availableOnly: availableOnly});
         if (searchResults.length === 0) {
-            this.view.noBookFoundSearch(title, author, isbn, availableOnly);
+            this.view.noBookFoundSearch();
         }
         else {
             this.view.validSearch(searchResults);
