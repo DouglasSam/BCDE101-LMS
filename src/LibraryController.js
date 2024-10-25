@@ -227,6 +227,132 @@ class UserManagementController {
 
     setCurrentView() {
         this.view.render();
+
+        const dataSetButton = document.getElementById('dataSet');
+        const resetButton = document.getElementById('reset');
+        const userForm = document.getElementById('user-form');
+        const searchInput = document.getElementById('search');
+
+        dataSetButton.addEventListener('click', this.handleLoadUsersFromDataSet.bind(this));
+        resetButton.addEventListener('click', this.handleResetUsers.bind(this));
+        userForm.addEventListener('submit', this.handleAddUser.bind(this));
+        searchInput.addEventListener('input', this.handleSearch.bind(this));
+
+        this.view.updateUserTable(this.model.session.users)
+
+        this.addButtonListeners();
+
+    }
+
+    addButtonListeners() {
+        const editButtons = document.querySelectorAll('.update-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', this.handleEditUser.bind(this));
+        });
+
+        const cancelEditButtons = document.querySelectorAll('.cancel-edit');
+        cancelEditButtons.forEach(button => {
+            button.addEventListener('click', this.handleCancelEdit.bind(this));
+        });
+
+        const removeButtons = document.querySelectorAll('.remove-user');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', this.handleRemoveUser.bind(this));
+        });
+
+        const updateButtons = document.querySelectorAll('.update-user');
+        updateButtons.forEach(button => {
+            button.addEventListener('click', this.handleUpdateUser.bind(this));
+        });
+    }
+
+    handleCancelEdit(event) {
+        event.preventDefault();
+        const rowID = event.target.attributes.getNamedItem('data-row-id').value;
+        const userId = event.target.attributes.getNamedItem('data-user-id').value;
+        const user = this.model.searchUsers({userId: userId})[0];
+        this.view.SetToRowMode(rowID, user);
+        this.addButtonListeners();
+    }
+
+    handleEditUser(event) {
+        const rowID = event.target.getAttribute('data-row-id');
+        const userId = event.target.getAttribute('data-user-id');
+        const user = this.model.searchUsers({userId: userId})[0];
+        this.view.setToEditMode(rowID, user);
+        this.addButtonListeners();
+    }
+
+    handleUpdateUser(event) {
+        event.preventDefault();
+        const rowID = event.target.attributes.getNamedItem('data-row-id').value;
+        const userId = event.target.attributes.getNamedItem('data-user-id').value;
+        const newName = document.getElementById(`name-${rowID}`).value;
+        const newEmail = document.getElementById(`email-${rowID}`).value;
+        const newPassword = document.getElementById(`password-${rowID}`).value;
+        const newRole = document.getElementById(`role-${rowID}`).value;
+        const newMembershipId = document.getElementById(`membershipId-${rowID}`).value;
+        this.model.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
+        const newUser = this.model.searchUsers({userId: userId})[0];
+        this.view.SetToRowMode(rowID, newUser);
+        this.addButtonListeners();
+    }
+
+    handleRemoveUser(event) {
+        event.preventDefault();
+        const userId = event.target.attributes.item(2).value;
+        const user = this.model.searchUsers({userId: userId})[0];
+        if (confirm(`Are you sure you want to permanently delete ${user.name}?`)) {
+            this.model.removeUser(userId);
+            this.view.updateUserTable(this.model.session.users);
+            this.addButtonListeners();
+        }
+    }
+
+    handleSearch() {
+        const query = document.getElementById('search').value;
+        const filteredUsers = this.model.searchUsers({query: query});
+        this.view.updateUserTable(filteredUsers);
+        this.addButtonListeners();
+    }
+
+    handleAddUser(event) {
+        event.preventDefault();
+        const name = document.getElementById('full-name').value;
+        const emailElement = document.getElementById('email');
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value
+        const success = this.model.addUser(name, emailElement.value, password, role)
+        if (success) {
+            this.view.clearForm();
+            this.view.updateUserTable(this.model.session.users);
+            this.addButtonListeners();
+            document.getElementById('invalid-user').hidden = true;
+        }
+        else {
+            document.getElementById('invalid-user').hidden = false;
+            emailElement.value = "";
+            emailElement.focus();
+        }
+    }
+
+    handleResetUsers(event) {
+        event.preventDefault();
+        if (confirm(`Are you sure you want to permanently delete ALL users?`)) {
+            this.model.clearAllUsers();
+            this.view.updateUserTable(this.model.session.users);
+        }
+    }
+
+    handleLoadUsersFromDataSet(event) {
+        event.preventDefault();
+        if (confirm(`Are you sure you want to replace ALL users with those defined in the starting data set?`)) {
+            this.model.clearAllUsers();
+            this.model.resetUsersFromDataSet().then(() => {
+                this.view.updateUserTable(this.model.session.users);
+                this.addButtonListeners();
+            });
+        }
     }
 
 }
@@ -442,9 +568,8 @@ class HomeController {
      * Also handles displaying the nav and logout button
      */
     setCurrentView() {
-        this.view.render(this.model.loggedInUser);
-
-        if (this.model.loggedInUser) {
+        this.view.render(this.model.session.loggedInUser);
+        if (this.model.session.loggedInUser) {
             //user is logged in
             this.logoutButton.hidden = false;
             document.getElementById("nav").hidden = false;
@@ -484,26 +609,23 @@ class HomeController {
 // Map of the different controllers to a string key
 const controllers = new Map();
 
+
 // On Load sets up the MVC groups of page loads last page if in the same session
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Document Loaded");
-
-    const users = [];
+    const catalogue = new Catalogue();
+    const session = new Session();
+    
     // Creates the default user of admin, will update name, and password if list of users exist in local storage
-    if (users.length === 0) {
+    if (session.users.length === 0) {
         const admin = new Librarian(1, 'admin', 'admin@admin');
-        await admin.initKeyPair();
-        encrypt('admin', admin.publicKey).then(async (encrypted) => {
-            admin.encryptedPassword = encrypted;
-        });
-        users.push(admin);
+        session.users.push(admin);
     }
 
-    const catalogue = new Catalogue();
     // user-management deals with user list initialization so must be done first
-
-    const userManagementModel = new UserManagementModel(users);
-    const homeModel = new HomeModel(null, userManagementModel.users)
+    const userManagementModel = new UserManagementModel(session);
+    const homeModel = new HomeModel(session);
+    
 
     // Logic for logout button
     const logoutButton = document.getElementById('logout-btn');
@@ -556,21 +678,5 @@ function loadPage(id, event) {
     sessionStorage.setItem('currentPage', id);
 }
 
-/**
- * Function to encrypt a value with a public key
- * Code modified from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt#rsa-oaep
- * @param value - value to encrypt
- * @param publicKey - public key to encrypt with
- * @returns {Promise<ArrayBuffer>} encrypted value encased in a promise
- */
-async function encrypt(value, publicKey) {
-    let encoded = new TextEncoder().encode(value);
-    return await window.crypto.subtle.encrypt(
-        {
-            name: "RSA-OAEP"
-        },
-        publicKey,
-        encoded
-    );
-}
+
 

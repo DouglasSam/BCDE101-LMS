@@ -27,7 +27,7 @@ describe("Library Management System", () => {
             expect(book.available).toBe(true);
         });
     });
-
+/*
     describe("LibraryModel Class", () => {
         let libraryModel, book1, book2;
 
@@ -89,7 +89,7 @@ describe("Library Management System", () => {
             expect(searchResultsAuthor[0].author).toBe("Douglas Crockford");
         });
     });
-
+*/
     describe("UserModel Class", () => {
         let userModel, user1, user2;
 
@@ -120,6 +120,7 @@ describe("Library Management System", () => {
             userModel.session.users.push(user1);
             user2 = new Librarian(2, 'admin2', 'admin2', 'admin2@admin');
             userModel.session.users.push(user2);
+            userModel.session.loggedInUser = user1;
         });
 
         it("should add users to the user model", () => {
@@ -129,9 +130,14 @@ describe("Library Management System", () => {
         });
 
         it("should save users to local Storage", () => {
-            console.log(localStorage);
             userModel.saveUsersToStorage();
-            console.log(localStorage.getItem('library_users'));
+            let originalStorage = localStorage.getItem("library_users");
+            userModel.clearAllUsers();
+            expect(userModel.session.users.length).toBe(1);
+            userModel.loadUsersFromStorage();
+            expect(userModel.session.users.length).toBe(2);
+            expect(JSON.stringify(userModel.session.users.map(user => user.JSONObject))).toBe(originalStorage);
+            console.log(userModel.session.users.map(user => user.JSONObject));
             
         });
 

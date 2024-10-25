@@ -13,14 +13,13 @@
 
 class HomeModel {
 
-    constructor(loggedInUser, users) {
-        this.loggedInUser = loggedInUser;
-        this.users = users;
+    constructor(session) {
+        this.session = session;
         this.loadLoggedInUser();
     }
     
     logout() {
-        this.loggedInUser = null;
+        this.session.loggedInUser = null;
         localStorage.removeItem('loggedInUser');
     }
     
@@ -28,21 +27,21 @@ class HomeModel {
         const loggedInUserJSON = localStorage.getItem('loggedInUser');
         const email = loggedInUserJSON ? JSON.parse(loggedInUserJSON) : null;
         if (email) {
-            this.loggedInUser = this.getUserByEmail(email);
+            this.session.loggedInUser = this.getUserByEmail(email);
         }
     }
 
     saveLoggedInUser() {
-        localStorage.setItem('loggedInUser', JSON.stringify(this.loggedInUser.email));
+        localStorage.setItem('loggedInUser', JSON.stringify(this.session.loggedInUser.email));
     }
 
     async logInUser(email, password, rememberMe) {
         const user = this.getUserByEmail(email);
         if (user) {
-            const encryptedEnteredPassword = await encrypt(password, user.publicKey);
+            const encryptedEnteredPassword = await Session.encrypt(password, user.publicKey);
             const valid = await user.checkCredentials(email, encryptedEnteredPassword)
             if (valid) {
-                this.loggedInUser = user;
+                this.session.loggedInUser = user;
                 if (rememberMe)
                     this.saveLoggedInUser();
                 return true;
@@ -53,9 +52,8 @@ class HomeModel {
 
 
     getUserByEmail(email) {
-        const filtered = this.users.filter(user => user.email === email);
+        const filtered = this.session.users.filter(user => user.email === email);
         return filtered.length === 1 ? filtered[0] : null;
-
     }
 
 }
@@ -197,11 +195,65 @@ class CatalogueManagementModel {
  */
 class UserManagementModel {
 
-    constructor(users) {
-        this.users = users;
+    #START_USER_ID = 100000;
+    maxUserId = this.#START_USER_ID;
+
+
+    constructor(session) {
+        this.session = session;
         this.loadUsersFromStorage();
+        
     }
-    
+
+    getUserByEmail(email) {
+        const filtered = this.session.users.filter(user => user.email === email);
+        return filtered.length === 1 ? filtered[0] : null;
+    }
+
+    loadUsersFromStorage() {
+        const loggedIn = this.session.loggedInUser;
+        this.session.loggedInUser = new Librarian(1, 'system', 'system@system', 'system');
+        let usersJSON = localStorage.getItem('library_users');
+        let users = usersJSON ? JSON.parse(usersJSON) : [];
+        this.#loadFromArray(users);
+        this.session.loggedInUser = loggedIn;``
+    }
+
+    saveUsersToStorage() {
+        let usersJSON = JSON.stringify(this.session.users.map(user => user.JSONObject));
+        localStorage.setItem('library_users', usersJSON);
+    }
+
+    addUser(name, email, password, role, userId = undefined,  membershipId = undefined, borrowedBooks = []) {
+        if (this.getUserByEmail(email) !== null) return false;
+        if (userId === undefined) userId = this.maxUserId++;
+        if (membershipId === undefined) membershipId = userId;
+        this.session.users.push(this.session.loggedInUser.registerUser(userId, name, email, password, role, membershipId, borrowedBooks));
+        this.saveUsersToStorage();
+        return true;
+    }
+
+    clearAllUsers() {
+        this.session.users.length = 0;
+        this.maxUserId = this.#START_USER_ID;
+        this.session.users.push(this.session.loggedInUser)
+    }
+
+    #loadFromArray(users) {
+        users.forEach(user => {
+            this.addUser(user.name, user.email, user.password, user.role, user.userId);
+        });
+    }
+
+    async resetUsersFromDataSet() {
+        const userFetch = await fetch("./src/lib/Users.json");
+        let users = [];
+        if (userFetch.ok) {
+            users = await userFetch.json();
+        }
+        this.#loadFromArray(users);
+    }
+
 }
 
 /**

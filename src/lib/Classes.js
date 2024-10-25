@@ -47,7 +47,7 @@ class Book {
      * Allows for multiple different types of searches
      * e.g. Search for title, author, or isbn or search just in title, or search in any combination
      * the search does not handle exact matches but handles partial matches instead
-     * @param {Object} params Object that contains search queries, for example searching for id you would pass in 
+     * @param {Object} params Object that contains search queries, for example searching for id you would pass in
      *                      { id: id } and searching for multiple queries you would pass in { id: id, title: title } etc.
      * @param query - Searches in title, author, or isbn
      * @param id - Searches for the book id only one that returns if exact match
@@ -68,7 +68,7 @@ class Book {
                 this.#isbn.toString().includes(query.toString());
         }
         if (availableOnly && this.#availability === false) return false;
-        
+
         const searchResults = [];
         if (id !== false) {
             searchResults.push(this.#bookId.toString() === id.toString());
@@ -88,7 +88,7 @@ class Book {
         if (availableOnly !== false)
             searchResults.push(this.#availability);
         if (searchResults.length === 0) return false;
-       return searchResults.every(result => result);
+        return searchResults.every(result => result);
     }
 
     /**
@@ -181,7 +181,7 @@ class Catalogue {
      * - location - Searches in location
      * - description - Searches in description
      * - availableOnly - Will only return books that are available even if the other parameters match
-     * 
+     *
      * @returns {*} A list of the books that match the query or an empty list if none match
      */
     searchBooks(params) {
@@ -197,7 +197,16 @@ class Catalogue {
     }
 }
 
-// Parent Class: User
+/**
+ * @class User
+ * @classdesc Represents a user in the library system
+ * @property {number} #userId - The unique identifier for the user
+ * @property {string} #name - The name of the user
+ * @property {string} #email - The email of the user
+ * @property {string} #password - The password of the user
+ * @property {string} #role - The role of the user, either 'Member' or 'Librarian'
+ * @constructor - Creates a new user, does not generate a key pair or set the password.
+ */
 class User {
 
     #userId;
@@ -205,56 +214,61 @@ class User {
     #email;
     #password;
     #role;
-    #keyPair;
-    #loggedIn
-
-    /**
-     *
-     * @param userId
-     * @param name
-     * @param email
-     * @param role
-     */
-    constructor(userId, name, email, role) {
+    
+    constructor(userId, name, email, password, role) {
         this.#userId = userId;
         this.#name = name;
         this.#email = email;
+        this.#password = password;
         this.#role = role;
-        this.#loggedIn = false;
-    }
-
-    async initKeyPair() {
-        this.#keyPair = await this.generateKeyPair();
     }
     
-    set encryptedPassword(password) {
-        this.#setEncryptedPassword(password).then(decryptedPassword => this.#password = decryptedPassword);
-    }
-    
-    async #setEncryptedPassword(password) {
-        return await this.#decryptMessage(password);
-    }
-
-    registerUser() {
+    /**
+     * Registers a user with the provided details
+     * Also encrypts the password with the generated public key
+     * @param userId - The unique identifier for the user
+     * @param name - The name of the user
+     * @param email - The email of the user
+     * @param password - The password of the user
+     * @param role - The role of the user, either 'Member' or 'Librarian'
+     * @param membershipId - The membership id of the member (otherwise undefined)
+     * @param borrowedBooks - The books that the member has borrowed (otherwise undefined)
+     * @returns {Promise<Member|Librarian>} The new user
+     */
+    registerUser(userId, name, email, password, role, membershipId = undefined, borrowedBooks = undefined) {
+        let user;
+        if (role.toLowerCase() === 'librarian') {
+            user = new Librarian(userId, name, email, password);
+        } else {
+            user = new Member(userId, name, email, password, membershipId, borrowedBooks);
+        }
         
+        return user;
     }
 
     updateUser() {
-        
+
     }
 
     deleteUser() {
-        
+
     }
 
-    async checkCredentials(email, encryptedPassword) {
-        return this.#email === email && this.#password === await this.#decryptMessage(encryptedPassword);
+    /**
+     * Checks the credentials of the user based on a provided email
+     * and a password with another password
+     * @param email - The email provided by the user
+     * @param password - The password provided by the user
+     * @returns {boolean} Returns true if the credentials match, false if they do not
+     */
+    checkCredentials(email, password) {
+        return this.#email === email && this.#password === password;
     }
 
     get userId() {
         return this.#userId;
     }
-    
+
     get name() {
         return this.#name;
     }
@@ -266,43 +280,37 @@ class User {
     get role() {
         return this.#role;
     }
-    
-    get publicKey() {
-        return this.#keyPair.publicKey;
-    }
 
-    async #decryptMessage(ciphertext) {
-        return await window.crypto.subtle.decrypt(
-            {
-                name: "RSA-OAEP"
-            },
-            this.#keyPair.privateKey,
-            ciphertext
-        ).then(decrypted => {
-        let dec = new TextDecoder();
-        return dec.decode(decrypted); });
+
+    /**
+     * This is the equivalent of saving data to database.
+     * @returns {{password, role, name, publicKey, userId, email}} The user object as a JSON object
+     */
+    get JSONObject() {
+
+        return {
+            userId: this.#userId,
+            name: this.#name,
+            email: this.#email,
+            role: this.#role,
+            password: this.#password
+        };
+
     }
 
     /**
-     * Generates a new RSA key pair for the user
-     * Code modified from https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/rsa-oaep.js
-     * Referenced from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt#rsa-oaep
-     * @returns {Promise<CryptoKeyPair>} The generated key pair encased in a promise
+     * This is the equivalent of reading data from a database.
+     * Used for loading from local storage
+     * @param obj
+     * @constructor
      */
-    async generateKeyPair() {
-        return window.crypto.subtle.generateKey(
-            {
-                name: "RSA-OAEP",
-                // Consider using a 4096-bit key for systems that require long-term security
-                modulusLength: 2048,
-                publicExponent: new Uint8Array([1, 0, 1]),
-                hash: "SHA-256",
-            },
-            true,
-            ["encrypt", "decrypt"]
-        )
+    set JSONObject(obj) {
+        this.#userId = obj.userId;
+        this.#name = obj.name;
+        this.#email = obj.email;
+        this.#role = obj.role;
+        this.#password = obj.password;
     }
-    
 }
 
 
@@ -310,55 +318,72 @@ class Member extends User {
 
     #membershipId;
     #borrowedBooks;
-    
+
     constructor(userId, name, email, password, membershipId, borrowedBooks=[]) {
-        super(userId, name, email, password, 'Member'); 
-        this.#membershipId = membershipId; 
-        this.#borrowedBooks = borrowedBooks; 
+        super(userId, name, email, password, 'Member');
+        this.#membershipId = membershipId;
+        this.#borrowedBooks = borrowedBooks;
     }
 
     borrowBook(book) {
-        
+
     }
 
     returnBook(book) {
-        
+
     }
 
     checkBorrowingStatus() {
-        
+
+    }
+
+    get JSONObject() {
+        const obj = super.JSONObject;
+        obj.membershipId = this.#membershipId;
+        obj.borrowedBooks = this.#borrowedBooks;
+        return obj;
     }
 }
 
 
 class Librarian extends User {
-    
-    constructor(userId, name, email) {
-        super(userId, name, email, 'Librarian'); 
+
+    constructor(userId, name, email, password) {
+        super(userId, name, email, password, 'Librarian');
     }
 
     addBook(book) {
-        
+
     }
 
     updateBook(book) {
-        
+
     }
 
     deleteBook(book) {
-        
+
     }
 
-    
-    registerUser() {
-        super.registerUser(); 
+
+    registerUser(userId, name, email, password, role, membershipId = undefined, borrowedBooks=[]) {
+        return super.registerUser(userId, name, email, password, role, membershipId, borrowedBooks);
     }
 
     updateUser() {
-        super.updateUser(); 
+        super.updateUser();
     }
 
     deleteUser() {
-        super.deleteUser(); 
+        super.deleteUser();
+    }
+}
+
+/**
+ * Stores variables shared across the different models
+ */
+class Session {
+    constructor() {
+        this.users = [];
+        this.loggedInUser = null;
     }
 }

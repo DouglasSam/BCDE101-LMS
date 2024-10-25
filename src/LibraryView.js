@@ -211,13 +211,152 @@ class CatalogueManagementView {
  * @copyright Samuel Douglas
  */
 class UserManagementView {
-
+    
     /**
      * Renders the base view
      */
     render() {
         document.getElementById("main").innerHTML =
-            "<h2>Welcome to the User Management Page</h2>";
+            `
+        <h2>Add a User</h2>
+        <ul>
+            <li><a id="dataSet" href="#">Reset from DataSet</a></li>
+            <li><a id="reset" href="#">Reset</a></li>
+        </ul>
+        <h2>Enter new User Details:</h2>
+        <form id="user-form">
+              <div class="mb-3">
+                <label for="full-name" class="form-label">Full Name:</label>
+                <input type="text" class="form-control" id="full-name" placeholder="Full Name" required >
+              </div>
+              
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email" placeholder="email@email.com" required >
+                  </div>
+              
+                  <div class="flex-fill">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="password" placeholder="password" required >
+                  </div>
+              </div>
+                  
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="genre" class="form-label">Role:</label>
+                    <select class="form-select" id="role" >
+                        <option value="librarian">Librarian</option>
+                        <option value="member">Member</option>
+                    </select>
+                  </div>
+              </div>
+              <p id="invalid-user" class="text-danger" hidden>A user with that email already exists. Make sure the email is unique.</p>
+              <button type="submit" class="btn btn-primary">Register User</button>
+            </form>
+
+        <h2>Search Users</h2>
+        <input type="text" id="search" placeholder="Search by name, email, or id">
+        
+        <h2>Users in System</h2>
+        <h3 id="num-users"></h3>
+        <table id="user-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Action</th>                 
+                </tr>
+            </thead>
+            <tbody>
+                <!-- User rows will be inserted here -->
+            </tbody>
+        </table>
+            `
+        this.userTableBody = document.querySelector('#user-table tbody');
+        this.userCount = document.getElementById('num-users');
+        
+        
+    }
+
+    updateUserTable(users) {
+        this.userCount.innerHTML = `There are ${users.length} in the system at the moment`;
+        this.userTableBody.innerHTML = '';
+        let rowNum = 1;
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.id = `book-${rowNum++}`;
+            this.userTableBody.appendChild(row);
+            this.SetToRowMode(row.id, user);
+        });
+    }
+
+    /**
+     * Sets the row to the basic view mode with the smaller details and an edit button
+     * @param rowId - The id of the row to update
+     * @param user - The user to display the details from
+     */
+    SetToRowMode(rowId, user) {
+        document.getElementById(rowId).innerHTML =
+            `
+                <td>${user.userId}</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+                <td>
+                    <button class="update-btn btn btn-primary" data-user-id="${user.userId}" data-row-id="${rowId}">Edit or Delete Row</button>
+                </td>
+            `
+    }
+
+    setToEditMode(rowId, user) {
+        document.getElementById(rowId).innerHTML = `
+        <td colspan="5">
+            <form id="user-form-${rowId}">
+              <div class="mb-3">
+                <label for="full-name-${rowId}" class="form-label">Full Name:</label>
+                <input type="text" class="form-control" id="full-name-${rowId}" placeholder="Full Name" required value="${user.name}">
+              </div>
+              
+              <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="flex-fill">
+                    <label for="email-${rowId}" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email-${rowId}" placeholder="email@email.com" required value="${user.email}">
+                </div>
+                
+                <div class="flex-fill">
+                    <label for="password-${rowId}" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="password-${rowId}" placeholder="Leave Blank to not update" >
+                </div>
+              </div>
+              
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="flex-fill">
+                        <label for="role-${rowId}" class="form-label">Role:</label>
+                        <select class="form-select" id="role-${rowId}" disabled>
+                            <option value="librarian" ${user.role === "librarian" ? "selected" : ""}>Librarian</option>
+                            <option value="member" ${user.role === "member" ? "selected" : ""}>Member</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center justify-content-between gap-3">
+                    <button type="submit" class="btn btn-warning cancel-edit" data-user-id="${user.userId}" data-row-id="${rowId}">Cancel</button>
+                    <button type="submit" class="btn btn-primary update-user" data-user-id="${user.userId}" data-row-id="${rowId}">Update User</button>
+                    <button type="submit" class="btn btn-danger remove-user" data-user-id="${user.userId}">Remove User</button>
+                </div>
+            </form>
+        </td>
+        `
+    }
+
+    /**
+     * Clears the add user form of any input
+     */
+    clearForm() {
+        document.getElementById('user-form').reset();
     }
 
 }
