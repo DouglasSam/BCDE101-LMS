@@ -17,7 +17,18 @@
 </head>
 <body class="d-flex flex-column h-100">
     <header class="container flex-shrink-0">
-        <h1 class="display-3 fw-bold text-center"><a class="  text-decoration-none link-dark"  href="#" onclick="loadPage('home', event)">Library Management System</a></h1>
+
+        <div class="d-flex align-content-center justify-content-between">
+            <h1 class="display-3 fw-bold text-center">
+                <a class="  text-decoration-none link-dark" href="#"
+                   onclick="loadPage('home', event)">Library Management System</a>
+            </h1>
+
+            <div class="d-flex align-items-center">
+                <button id="logout-btn" type="button" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+        
     </header>
 
         <nav id="nav">

@@ -196,3 +196,169 @@ class Catalogue {
         return this.#books.map(book => book.viewBookDetails());
     }
 }
+
+// Parent Class: User
+class User {
+
+    #userId;
+    #name;
+    #email;
+    #password;
+    #role;
+    #keyPair;
+    #loggedIn
+
+    /**
+     *
+     * @param userId
+     * @param name
+     * @param email
+     * @param role
+     */
+    constructor(userId, name, email, role) {
+        this.#userId = userId;
+        this.#name = name;
+        this.#email = email;
+        this.#role = role;
+        this.#loggedIn = false;
+    }
+
+    async initKeyPair() {
+        this.#keyPair = await this.generateKeyPair();
+    }
+    
+    set encryptedPassword(password) {
+        this.#setEncryptedPassword(password).then(decryptedPassword => this.#password = decryptedPassword);
+    }
+    
+    async #setEncryptedPassword(password) {
+        return await this.#decryptMessage(password);
+    }
+
+    registerUser() {
+        
+    }
+
+    updateUser() {
+        
+    }
+
+    deleteUser() {
+        
+    }
+
+    async checkCredentials(email, encryptedPassword) {
+        return this.#email === email && this.#password === await this.#decryptMessage(encryptedPassword);
+    }
+
+    get userId() {
+        return this.#userId;
+    }
+    
+    get name() {
+        return this.#name;
+    }
+
+    get email() {
+        return this.#email;
+    }
+
+    get role() {
+        return this.#role;
+    }
+    
+    get publicKey() {
+        return this.#keyPair.publicKey;
+    }
+
+    async #decryptMessage(ciphertext) {
+        return await window.crypto.subtle.decrypt(
+            {
+                name: "RSA-OAEP"
+            },
+            this.#keyPair.privateKey,
+            ciphertext
+        ).then(decrypted => {
+        let dec = new TextDecoder();
+        return dec.decode(decrypted); });
+    }
+
+    /**
+     * Generates a new RSA key pair for the user
+     * Code modified from https://github.com/mdn/dom-examples/blob/main/web-crypto/encrypt-decrypt/rsa-oaep.js
+     * Referenced from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt#rsa-oaep
+     * @returns {Promise<CryptoKeyPair>} The generated key pair encased in a promise
+     */
+    async generateKeyPair() {
+        return window.crypto.subtle.generateKey(
+            {
+                name: "RSA-OAEP",
+                // Consider using a 4096-bit key for systems that require long-term security
+                modulusLength: 2048,
+                publicExponent: new Uint8Array([1, 0, 1]),
+                hash: "SHA-256",
+            },
+            true,
+            ["encrypt", "decrypt"]
+        )
+    }
+    
+}
+
+
+class Member extends User {
+
+    #membershipId;
+    #borrowedBooks;
+    
+    constructor(userId, name, email, password, membershipId, borrowedBooks=[]) {
+        super(userId, name, email, password, 'Member'); 
+        this.#membershipId = membershipId; 
+        this.#borrowedBooks = borrowedBooks; 
+    }
+
+    borrowBook(book) {
+        
+    }
+
+    returnBook(book) {
+        
+    }
+
+    checkBorrowingStatus() {
+        
+    }
+}
+
+
+class Librarian extends User {
+    
+    constructor(userId, name, email) {
+        super(userId, name, email, 'Librarian'); 
+    }
+
+    addBook(book) {
+        
+    }
+
+    updateBook(book) {
+        
+    }
+
+    deleteBook(book) {
+        
+    }
+
+    
+    registerUser() {
+        super.registerUser(); 
+    }
+
+    updateUser() {
+        super.updateUser(); 
+    }
+
+    deleteUser() {
+        super.deleteUser(); 
+    }
+}

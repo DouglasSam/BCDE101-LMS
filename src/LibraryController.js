@@ -32,7 +32,7 @@
  * @copyright Samuel Douglas
  */
 class CatalogueManagementController {
-    
+
     constructor(model, view) {
         this.model = model;
         this.view = view;
@@ -84,7 +84,11 @@ class CatalogueManagementController {
             button.addEventListener('click', this.handleCancelEdit.bind(this));
         });
     }
-    
+
+    /**
+     * EvenListener for canceling the edit form
+     * @param event - event for the listener
+     */
     handleCancelEdit(event) {
         event.preventDefault();
         const rowID = event.target.attributes.getNamedItem('data-row-id').value;
@@ -133,7 +137,7 @@ class CatalogueManagementController {
         let genre = document.getElementById('genre').value;
         let location = document.getElementById('location').value;
         const description = document.getElementById('description').value;
-        
+
         if (genre === '') genre = 'N/A';
         if (location === '') location = 'N/A';
         this.model.addBook(title, author, isbn, genre, location, description);
@@ -195,14 +199,14 @@ class CatalogueManagementController {
         event.preventDefault();
         const id = event.target.attributes.item(2).value;
         const book = this.model.catalogue.searchBooks({id: id})[0];
-        
+
         if (confirm(`Are you sure you want to permanently delete ${book.title} by ${book.author }?`)) {
             this.model.removeBook(id);
             this.view.updateBookTable(this.model.getBooks());
             this.addButtonListeners();
         }
     }
-    
+
 }
 
 /**
@@ -215,16 +219,16 @@ class CatalogueManagementController {
  * @copyright Samuel Douglas
  */
 class UserManagementController {
-    
+
     constructor(model, view) {
         this.model = model;
         this.view = view;
     }
-    
+
     setCurrentView() {
         this.view.render();
     }
-    
+
 }
 
 /**
@@ -245,7 +249,7 @@ class ReturnController {
 
     setCurrentView() {
         this.view.render();
-        
+
     }
 
     toggleSearchForm(event) {
@@ -259,7 +263,7 @@ class ReturnController {
 /**
  * @class SearchController
  * @classDesc Class that handles searching of the catalogue
- * Gives user the option to use a simple search query or complex 
+ * Gives user the option to use a simple search query or complex
  *      allowing for searching in the different sections of the book or only available books
  * Allows users to view all details about the book handles the borrowing of books
  * @property {SearchModel} model - The model for the controller
@@ -269,7 +273,7 @@ class ReturnController {
  * @copyright Samuel Douglas
  */
 class SearchController {
-    
+
     constructor(model, view) {
         this.model = model;
         this.view = view;
@@ -312,8 +316,8 @@ class SearchController {
             document.getElementById('complex-search-form').addEventListener('submit', this.handleComplexSearch.bind(this));
         }
     }
-    
-    
+
+
     /**
      * EventListener that will return the details view back to the list view
      * @param event - event for the listener
@@ -336,7 +340,7 @@ class SearchController {
         const book = this.model.searchBooks({id: id})[0];
         this.view.SetToDetailsRowMode(rowId, book);
         this.handleButtonListeners()
-        
+
     }
 
     /**
@@ -381,7 +385,7 @@ class SearchController {
             this.view.validSearch(searchResults);
             this.handleButtonListeners();
         }
-        
+
     }
 
     /**
@@ -398,11 +402,11 @@ class SearchController {
         const description = document.getElementById('description').value;
         const availableOnly = document.getElementById('search-available').checked;
         const searchResults = this.model.searchBooks({
-            title: title ? title : false, 
-            author: author ? author : false, 
-            isbn: isbn ? isbn : false, 
-            genre: genre ? genre : false, 
-            location: location ? location : false, 
+            title: title ? title : false,
+            author: author ? author : false,
+            isbn: isbn ? isbn : false,
+            genre: genre ? genre : false,
+            location: location ? location : false,
             description: description ? description : false,
             availableOnly: availableOnly});
         if (searchResults.length === 0) {
@@ -424,32 +428,105 @@ class SearchController {
  * @copyright Samuel Douglas
  */
 class HomeController {
-    
-    constructor(view) {
+
+    constructor(model, view) {
+        this.model = model;
         this.view = view;
+        this.logoutButton = document.getElementById('logout-btn');
     }
-    
+
+    /**
+     * Sets the current view for the controller
+     * Will display the login form if no user is logged in
+     * Will display the home page if a user is logged in
+     * Also handles displaying the nav and logout button
+     */
     setCurrentView() {
-        this.view.render();
+        this.view.render(this.model.loggedInUser);
+
+        if (this.model.loggedInUser) {
+            //user is logged in
+            this.logoutButton.hidden = false;
+            document.getElementById("nav").hidden = false;
+        }
+        else {
+            this.logoutButton.hidden = true;
+            document.getElementById("nav").hidden = true;
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', this.handleLogin.bind(this));
+        }
+
     }
+
+    /**
+     * EventListener for handling the login form
+     * Will either log the user in and display a welcome page or display an error message in the form
+     * @param event - event for the listener
+     * @returns {Promise<void>} returns a promise
+     */
+    async handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        const rememberMe = document.getElementById('remember-me').checked;
+        const password = document.getElementById('password').value;
+        const errorTag = document.getElementById('invalid-login');
+
+        if (await this.model.logInUser(email, password, rememberMe)) {
+            this.setCurrentView()
+        } else {
+            errorTag.hidden = false;
+        }
+
+    }
+
 }
 
 // Map of the different controllers to a string key
 const controllers = new Map();
 
 // On Load sets up the MVC groups of page loads last page if in the same session
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log("Document Loaded");
+
+    const users = [];
+    // Creates the default user of admin, will update name, and password if list of users exist in local storage
+    if (users.length === 0) {
+        const admin = new Librarian(1, 'admin', 'admin@admin');
+        await admin.initKeyPair();
+        encrypt('admin', admin.publicKey).then(async (encrypted) => {
+            admin.encryptedPassword = encrypted;
+        });
+        users.push(admin);
+    }
+
     const catalogue = new Catalogue();
-    controllers.set('user-management', new UserManagementController(new UserManagementModel(), new UserManagementView()));
+    // user-management deals with user list initialization so must be done first
+
+    const userManagementModel = new UserManagementModel(users);
+    const homeModel = new HomeModel(null, userManagementModel.users)
+
+    // Logic for logout button
+    const logoutButton = document.getElementById('logout-btn');
+    logoutButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        homeModel.logout();
+        loadPage('home', event);
+    });
+
     controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(catalogue), new CatalogueManagementView()));
     controllers.set('return-books', new ReturnController(new ReturnModel(), new ReturnView()));
     controllers.set('catalogue-search', new SearchController(new SearchModel(catalogue), new SearchView()));
-    controllers.set('home', new HomeController(new HomeView()));
+    controllers.set('user-management', new UserManagementController(userManagementModel, new UserManagementView()));
+    controllers.set('home', new HomeController(homeModel, new HomeView()));
     let currentPage = sessionStorage.getItem('currentPage');
     if (!currentPage) {
         currentPage = 'home';
     }
+    //If there is no user logged in then the home page is loaded regardless of the last page
+    if (localStorage.getItem('loggedInUser') === null) {
+        currentPage = 'home';
+    }
+
     loadPage(currentPage);
 });
 
@@ -477,5 +554,23 @@ function loadPage(id, event) {
         document.getElementById(id).classList.add('active');
     controller.setCurrentView();
     sessionStorage.setItem('currentPage', id);
+}
+
+/**
+ * Function to encrypt a value with a public key
+ * Code modified from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/encrypt#rsa-oaep
+ * @param value - value to encrypt
+ * @param publicKey - public key to encrypt with
+ * @returns {Promise<ArrayBuffer>} encrypted value encased in a promise
+ */
+async function encrypt(value, publicKey) {
+    let encoded = new TextEncoder().encode(value);
+    return await window.crypto.subtle.encrypt(
+        {
+            name: "RSA-OAEP"
+        },
+        publicKey,
+        encoded
+    );
 }
 

@@ -10,6 +10,56 @@
  * @copyright Samuel Douglas
  */
 
+
+class HomeModel {
+
+    constructor(loggedInUser, users) {
+        this.loggedInUser = loggedInUser;
+        this.users = users;
+        this.loadLoggedInUser();
+    }
+    
+    logout() {
+        this.loggedInUser = null;
+        localStorage.removeItem('loggedInUser');
+    }
+    
+    loadLoggedInUser() {
+        const loggedInUserJSON = localStorage.getItem('loggedInUser');
+        const email = loggedInUserJSON ? JSON.parse(loggedInUserJSON) : null;
+        if (email) {
+            this.loggedInUser = this.getUserByEmail(email);
+        }
+    }
+
+    saveLoggedInUser() {
+        localStorage.setItem('loggedInUser', JSON.stringify(this.loggedInUser.email));
+    }
+
+    async logInUser(email, password, rememberMe) {
+        const user = this.getUserByEmail(email);
+        if (user) {
+            const encryptedEnteredPassword = await encrypt(password, user.publicKey);
+            const valid = await user.checkCredentials(email, encryptedEnteredPassword)
+            if (valid) {
+                this.loggedInUser = user;
+                if (rememberMe)
+                    this.saveLoggedInUser();
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    getUserByEmail(email) {
+        const filtered = this.users.filter(user => user.email === email);
+        return filtered.length === 1 ? filtered[0] : null;
+
+    }
+
+}
+
 /**
  * @class CatalogueManagementModel
  * @classdesc Handles the management of the catalogue
@@ -134,25 +184,30 @@ class CatalogueManagementModel {
     getBooks() {
         return this.catalogue.getBooks();
     }
-    
+
 }
 
 /**
  * @class UserManagementModel
  * @classdesc Handles the management of the users
- * 
+ *
  * @constructor - Creates a new UserManagementModel
  * @author Samuel Douglas
  * @copyright Samuel Douglas
  */
 class UserManagementModel {
+
+    constructor(users) {
+        this.users = users;
+        this.loadUsersFromStorage();
+    }
     
 }
 
 /**
  * @class ReturnModel
  * @classdesc Handles the user returning books
- * 
+ *
  * @constructor - Creates a new ReturnModel
  * @author Samuel Douglas
  * @copyright Samuel Douglas
@@ -213,5 +268,5 @@ class SearchModel {
     getBooks() {
         return this.catalogue.getBooks();
     }
-    
+
 }
