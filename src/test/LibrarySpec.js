@@ -4,14 +4,16 @@ describe("Library Management System", () => {
         let book;
 
         beforeEach(() => {
-            book = new Book("JavaScript: The Good Parts", "Douglas Crockford", "9780596517748");
+            book = new Book(1, "JavaScript: The Good Parts", "Douglas Crockford", "9780596517748");
         });
 
         it("should create a book with title, author, isbn, and available status", () => {
-            expect(book.title).toBe("JavaScript: The Good Parts");
-            expect(book.author).toBe("Douglas Crockford");
-            expect(book.isbn).toBe("9780596517748");
-            expect(book.available).toBe(true);
+            const bookDetails = book.viewBookDetails();
+
+            expect(bookDetails.title).toBe("JavaScript: The Good Parts");
+            expect(bookDetails.author).toBe("Douglas Crockford");
+            expect(bookDetails.isbn).toBe("9780596517748");
+            expect(bookDetails.availability).toBe(true);
         });
 
         it("should mark the book as unavailable when checked out", () => {
@@ -86,5 +88,52 @@ describe("Library Management System", () => {
             expect(searchResultsAuthor.length).toBe(1);
             expect(searchResultsAuthor[0].author).toBe("Douglas Crockford");
         });
+    });
+
+    describe("UserModel Class", () => {
+        let userModel, user1, user2;
+
+        beforeEach(async () => {
+            // Mock localStorage with an empty object
+            const localStorageMock = (() => {
+                let store = {};
+                return {
+                    getItem(key) {
+                        return store[key] || null;
+                    },
+                    setItem(key, value) {
+                        store[key] = value.toString();
+                    },
+                    clear() {
+                        store = {};
+                    },
+                    removeItem(key) {
+                        delete store[key];
+                    }
+                };
+            })();
+            Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+            
+            
+            userModel = new UserManagementModel(new Session());
+            user1 = new Librarian(1, 'admin', 'admin', 'admin@admin');
+            userModel.session.users.push(user1);
+            user2 = new Librarian(2, 'admin2', 'admin2', 'admin2@admin');
+            userModel.session.users.push(user2);
+        });
+
+        it("should add users to the user model", () => {
+            expect(userModel.session.users.length).toBe(2);
+            expect(userModel.session.users[0].name).toBe("admin");
+            expect(userModel.session.users[1].name).toBe("admin2");
+        });
+
+        it("should save users to local Storage", () => {
+            console.log(localStorage);
+            userModel.saveUsersToStorage();
+            console.log(localStorage.getItem('library_users'));
+            
+        });
+
     });
 });
