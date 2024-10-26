@@ -42,7 +42,7 @@ class CatalogueManagementController {
      * Sets the current view for the controller
      */
     setCurrentView() {
-        this.view.render();
+        this.view.render(this.model.catalogue.getBooks().length);
         // DOM Elements
         this.bookForm = document.getElementById('book-form');
         this.searchInput = document.getElementById('search');

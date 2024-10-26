@@ -17,7 +17,7 @@ class CatalogueManagementView {
     /**
      * Renders the base view
      */
-    render() {
+    render(bookCount) {
         document.getElementById("main").innerHTML =
             `
         <h2>Add a Book</h2>
@@ -65,10 +65,10 @@ class CatalogueManagementView {
 
             </form>
 
-        <h2>Search Books</h2>
-        <input type="text" id="search" placeholder="Search by title or author">
+        <h2>Filter Books</h2>
+        <input type="text" id="search" placeholder="Filter by title or author">
         
-        <h2>Books in Library</h2>
+        <h2>There are ${bookCount} Books in the catalogue</h2>
         <h3 id="num-books"></h3>
         <table id="book-table" class="table table-striped">
             <thead>
@@ -90,7 +90,7 @@ class CatalogueManagementView {
         </table>
             `
         this.bookTableBody = document.querySelector('#book-table tbody');
-        this.bookCount = document.getElementById('num-books');
+        this.tableCount = document.getElementById('num-books');
     }
 
     /**
@@ -98,7 +98,7 @@ class CatalogueManagementView {
      * @param books - The list of books to update the table with
      */
     updateBookTable(books) {
-        this.bookCount.innerHTML = `There are ${books.length} in the library at the moment`;
+        this.tableCount.innerHTML = `Showing ${books.length} books from the catalogue`;
         this.bookTableBody.innerHTML = '';
         let rowNum = 1;
         books.forEach(book => {
