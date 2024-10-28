@@ -207,6 +207,14 @@ class UserManagementModel {
         this.loadUsersFromStorage();
         
     }
+    
+    removeUser(user) {
+        if (user === null) return false;
+        if (this.session.loggedInUser.userId === user.userId) return false;
+        this.session.users = this.session.users.filter(u => u.userId !== user.userId);
+        this.saveUsersToStorage();
+        return true;
+    }
 
     updateUser(userId, name, email, password, role, membershipId=undefined) {
         const user = this.getUserByID(userId);
@@ -242,9 +250,15 @@ class UserManagementModel {
         let usersJSON = localStorage.getItem('library_users');
         let users = usersJSON ? JSON.parse(usersJSON) : [];
         this.#loadFromArray(users);
-        // let admin = this.getUserByID(1);
-        // console.log(admin);
         this.session.loggedInUser = loggedIn;
+        // if (users !== []) {
+        //     if (loggedIn.userId !== 1) {
+        //         if (users.find(user => user.userId === 1) === undefined) {
+        //             this.session.users = this.session.users.filter(user => user.userId !== 1);
+        //         }
+        //     }
+        // }
+        //
     }
 
     saveUsersToStorage() {

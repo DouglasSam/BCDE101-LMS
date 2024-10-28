@@ -266,6 +266,7 @@ class UserManagementView {
                     <th>Full Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Membership ID<br>(Members Only)</th>
                     <th>Action</th>                 
                 </tr>
             </thead>
@@ -304,6 +305,7 @@ class UserManagementView {
                 <td>${user.name}</td>
                 <td>${user.email}</td>
                 <td>${user.role}</td>
+                <td>${user.membershipId ? user.membershipId : "NA"}</td>
                 <td>
                     <button class="update-btn btn btn-primary" data-user-id="${user.userId}" data-row-id="${rowId}">Edit or Delete Row</button>
                 </td>
@@ -312,7 +314,7 @@ class UserManagementView {
 
     setToEditMode(rowId, user) {
         document.getElementById(rowId).innerHTML = `
-        <td colspan="5">
+        <td colspan="6">
             <form id="user-form-${rowId}">
               <div class="d-flex align-items-center gap-3 mb-3">
                 <div class="flex-fill">

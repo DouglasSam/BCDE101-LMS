@@ -315,11 +315,14 @@ class UserManagementController {
     handleRemoveUser(event) {
         event.preventDefault();
         const userId = event.target.attributes.item(2).value;
-        const user = this.model.searchUsers({userId: userId})[0];
-        if (confirm(`Are you sure you want to permanently delete ${user.name}?`)) {
-            this.model.removeUser(userId);
-            this.view.updateUserTable(this.model.session.users);
-            this.addButtonListeners();
+        const user = this.model.getUserByID(userId);
+        if (user !== null) {
+            if (confirm(`Are you sure you want to permanently delete ${user.name}?`)) {
+                if (this.model.removeUser(user)) {
+                    this.view.updateUserTable(this.model.session.users);
+                    this.addButtonListeners();
+                }
+            }
         }
     }
 
