@@ -8,8 +8,8 @@
  * @requires CatalogueManagementView
  * @requires UserManagementModel
  * @requires UserManagementView
- * @requires ReturnModel
- * @requires ReturnView
+ * @requires BorrowRecordManagerModel
+ * @requires BorrowRecordManagerView
  * @requires SearchModel
  * @requires SearchView
  * @requires HomeView
@@ -413,15 +413,15 @@ class UserManagementController {
 }
 
 /**
- * @class ReturnModel
+ * @class BorrowRecordManagerModel
  * @classDesc Class that handles the user returning books
- * @property {ReturnModel} model - The model for the controller
- * @property {ReturnView} view - The view for the controller
+ * @property {BorrowRecordManagerModel} model - The model for the controller
+ * @property {BorrowRecordManagerView} view - The view for the controller
  * @constructor - Creates a new ReturnModel
  * @author Samuel Douglas
  * @copyright Samuel Douglas
  */
-class ReturnController {
+class BorrowRecordManagerController {
 
     constructor(model, view) {
         this.model = model;
@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(catalogue), new CatalogueManagementView()));
-    controllers.set('return-books', new ReturnController(new ReturnModel(), new ReturnView()));
+    controllers.set('return-books', new BorrowRecordManagerController(new BorrowRecordManagerModel(), new BorrowRecordManagerView()));
     controllers.set('catalogue-search', new SearchController(new SearchModel(catalogue), new SearchView()));
     controllers.set('user-management', new UserManagementController(userManagementModel, new UserManagementView()));
     controllers.set('home', new HomeController(homeModel, new HomeView()));

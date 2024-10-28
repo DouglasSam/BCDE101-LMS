@@ -388,12 +388,12 @@ class UserManagementView {
 }
 
 /**
- * @class ReturnView
+ * @class BorrowRecordManagerView
  * @classdesc Handles the view for the return of books by users
  * @author Samuel Douglas
  * @copyright Samuel Douglas
  */
-class ReturnView {
+class BorrowRecordManagerView {
 
     /**
      * Renders the base view
