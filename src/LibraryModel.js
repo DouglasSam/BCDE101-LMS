@@ -212,7 +212,10 @@ class UserManagementModel {
         const user = this.getUserByID(userId);
         if (user === null) return false;
         if (email !== user.email && this.getUserByEmail(email) !== null) return false
-        if (membershipId !== undefined && this.session.users.filter(user => user.membershipId === membershipId).length > 0) return false;
+        if (membershipId !== undefined && this.session.users.filter(user => {
+            if (user.membershipId === undefined) return false;
+            return user.membershipId.toString() === membershipId
+        }).length > 0) return false;
         user.updateUser(name, email, password, role, membershipId);
         if (this.session.loggedInUser.userId === userId) this.session.loggedInUser = user;
         this.saveUsersToStorage();
@@ -252,6 +255,7 @@ class UserManagementModel {
     addUser(name, email, password, role, userId = undefined,  membershipId = undefined, borrowedBooks = []) {
         if (this.getUserByEmail(email) !== null) return false;
         if (userId === undefined) userId = this.maxUserId++;
+        while (this.getUserByID(userId) !== null) userId = this.maxUserId++
         if (membershipId === undefined) membershipId = userId;
         this.session.users.push(this.session.loggedInUser.registerUser(userId, name, email, password, role, membershipId, borrowedBooks));
         this.saveUsersToStorage();

@@ -335,8 +335,8 @@ class Member extends User {
         super(userId, name, email, password, 'Member');
         this.#membershipId = membershipId;
         this.#borrowedBooks = borrowedBooks;
-        this._membershipId = membershipId;
-        this._borrowedBooks = borrowedBooks;
+        this.#membershipId = membershipId;
+        this.#borrowedBooks = borrowedBooks;
     }
 
     borrowBook(book) {

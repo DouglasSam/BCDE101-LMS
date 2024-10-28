@@ -302,8 +302,14 @@ class UserManagementController {
             newMembershipId = undefined;
         }
         const newUser = this.model.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
-        this.view.SetToRowMode(rowID, newUser);
-        this.addButtonListeners();
+        //An error occurred while updating user
+        if (newUser === false) {
+            document.getElementById('error-'+rowID).hidden = false;
+        }
+        else {
+            this.view.SetToRowMode(rowID, newUser);
+            this.addButtonListeners();
+        }
     }
 
     handleRemoveUser(event) {

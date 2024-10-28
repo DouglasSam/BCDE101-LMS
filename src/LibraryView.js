@@ -314,9 +314,15 @@ class UserManagementView {
         document.getElementById(rowId).innerHTML = `
         <td colspan="5">
             <form id="user-form-${rowId}">
-              <div class="mb-3">
-                <label for="full-name-${rowId}" class="form-label">Full Name:</label>
-                <input type="text" class="form-control" id="full-name-${rowId}" placeholder="Full Name" required value="${user.name}">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="flex-fill">
+                    <label for="user-id-${rowId}" class="form-label">User ID:</label>
+                    <input type="number" class="form-control" id="user-id-${rowId}" placeholder="User ID" required value="${user.userId}" disabled>
+                </div>
+                <div class="flex-fill">
+                    <label for="full-name-${rowId}" class="form-label">Full Name:</label>
+                    <input type="text" class="form-control" id="full-name-${rowId}" placeholder="Full Name" required value="${user.name}">
+                </div>
               </div>
               
               <div class="d-flex align-items-center gap-3 mb-3">
@@ -339,8 +345,15 @@ class UserManagementView {
                             <option value="member" ${user.role === "Member" ? "selected" : ""}>Member</option>
                         </select>
                     </div>
+                    <div id="member-only-${rowId}" class="flex-fill" hidden>
+                        <label for="membershipId-${rowId}" class="form-label">Membership ID:</label>
+                        <input type="number" class="form-control" id="membershipId-${rowId}" placeholder="1111111" required value="${user.membershipId}">
+                   </div>
                 </div>
                 
+                <div id="error-${rowId}" class="mb-3 form-check" hidden>
+                    <p class="text-danger">An error occured updating user, could be a duplicate email or membership ID</p>
+                </div>
                 <div class="d-flex align-items-center justify-content-between gap-3">
                     <button type="submit" class="btn btn-warning cancel-edit" data-user-id="${user.userId}" data-row-id="${rowId}">Cancel</button>
                     <button type="submit" class="btn btn-primary update-user" data-user-id="${user.userId}" data-row-id="${rowId}">Update User</button>
@@ -349,6 +362,9 @@ class UserManagementView {
             </form>
         </td>
         `
+        if (user.role === "Member") {
+            document.getElementById(`member-only-${rowId}`).hidden = false;
+        }
     }
 
     /**
