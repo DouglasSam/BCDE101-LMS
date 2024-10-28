@@ -616,7 +616,7 @@ class HomeView {
                     <input type="checkbox" id="remember-me"> Remember me
                   </label>
                 </div>
-                <p id="invalid-login" class="text-danger" hidden>Invalid Email or Password, Please try again</p>
+                <p id="invalid-login" class="text-danger" hidden>Invalid Email , Password, or Permissions, Please try again or contact your administrator.</p>
                 <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
               </form>
             `;

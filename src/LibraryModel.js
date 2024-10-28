@@ -38,12 +38,15 @@ class HomeModel {
     logInUser(email, password, rememberMe) {
         const user = this.getUserByEmail(email);
         if (user) {
-            const valid = user.checkCredentials(email, password)
-            if (valid) {
-                this.session.loggedInUser = user;
-                if (rememberMe)
-                    this.saveLoggedInUser();
-                return true;
+            // Only allow Librarians to log in
+            if (user.role === "Librarian") {
+                const valid = user.checkCredentials(email, password)
+                if (valid) {
+                    this.session.loggedInUser = user;
+                    if (rememberMe)
+                        this.saveLoggedInUser();
+                    return true;
+                }
             }
         }
 
