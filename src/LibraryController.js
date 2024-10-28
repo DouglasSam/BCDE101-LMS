@@ -42,7 +42,7 @@ class CatalogueManagementController {
      * Sets the current view for the controller
      */
     setCurrentView() {
-        this.view.render(this.model.catalogue.getBooks().length);
+        this.view.render(this.model.session.catalogue.getBooks().length);
         // DOM Elements
         this.bookForm = document.getElementById('book-form');
         this.searchInput = document.getElementById('search');
@@ -106,7 +106,7 @@ class CatalogueManagementController {
         event.preventDefault();
         if (confirm(`Are you sure you want to permanently delete ALL books?`)) {
             this.model.clearAllBooks();
-            this.view.updateBookTable(this.model.getBooks());
+            this.setCurrentView();
         }
     }
 
@@ -119,8 +119,7 @@ class CatalogueManagementController {
         if (confirm(`Are you sure you want to replace ALL books with those defined in the starting data set?`)) {
             this.model.clearAllBooks();
             this.model.resetBooksFromDataSet().then(() => {
-                this.view.updateBookTable(this.model.getBooks());
-                this.addButtonListeners();
+                this.setCurrentView();
             });
         }
     }
@@ -198,7 +197,7 @@ class CatalogueManagementController {
     handleRemoveBook(event) {
         event.preventDefault();
         const id = event.target.attributes.item(2).value;
-        const book = this.model.catalogue.searchBooks({id: id})[0];
+        const book = this.model.session.catalogue.searchBooks({id: id})[0];
 
         if (confirm(`Are you sure you want to permanently delete ${book.title} by ${book.author }?`)) {
             this.model.removeBook(id);
@@ -645,7 +644,7 @@ class HomeController {
         const password = document.getElementById('password').value;
         const errorTag = document.getElementById('invalid-login');
 
-        if (await this.model.logInUser(email, password, rememberMe)) {
+        if (this.model.logInUser(email, password, rememberMe)) {
             this.setCurrentView()
         } else {
             errorTag.hidden = false;
@@ -662,7 +661,6 @@ const controllers = new Map();
 // On Load sets up the MVC groups of page loads last page if in the same session
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Document Loaded");
-    const catalogue = new Catalogue();
     const session = new Session();
     
     // Creates the default user of admin, will update name, and password if list of users exist in local storage
@@ -684,9 +682,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadPage('home', event);
     });
 
-    controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(catalogue), new CatalogueManagementView()));
+    controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(session), new CatalogueManagementView()));
     controllers.set('return-books', new BorrowRecordManagerController(new BorrowRecordManagerModel(), new BorrowRecordManagerView()));
-    controllers.set('catalogue-search', new SearchController(new SearchModel(catalogue), new SearchView()));
+    controllers.set('catalogue-search', new SearchController(new SearchModel(session), new SearchView()));
     controllers.set('user-management', new UserManagementController(userManagementModel, new UserManagementView()));
     controllers.set('home', new HomeController(homeModel, new HomeView()));
     let currentPage = sessionStorage.getItem('currentPage');

@@ -473,5 +473,6 @@ class Session {
     constructor() {
         this.users = [];
         this.loggedInUser = null;
+        this.catalogue = new Catalogue();
     }
 }

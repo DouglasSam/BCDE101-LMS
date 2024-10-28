@@ -400,7 +400,7 @@ class BorrowRecordManagerView {
      */
     render() {
         document.getElementById("main").innerHTML =
-            "<h2>Welcome to the Borrow/Return Page</h2>";
+            "<h2>Welcome to the Borrowing Record Manager Page Page</h2>";
     }
 
 }
@@ -545,17 +545,17 @@ class SearchView {
 
     /**
      * Displays the search results to the user
-     * @param results - The list of books that match the search query
+     * @param books - The list of books that match the search query
      */
-    validSearch(results) {
+    validSearch(books) {
         this.searchTitle.hidden = false;
-        this.searchTitle.innerHTML = `Found ${results.length} books:`;
+        this.searchTitle.innerHTML = `Found ${books.length} books:`;
         this.noResults.hidden = true;
         this.searchResults.hidden = false;
 
         this.bookTableBody.innerHTML = '';
         let count = 1;
-        results.forEach(result => {
+        books.forEach(result => {
             const row = document.createElement('tr');
             row.id = `book-${count++}`;
             this.bookTableBody.appendChild(row);
@@ -587,23 +587,28 @@ class SearchView {
      * Sets the row to the details view mode with all the details of the book
      * also allows a user to borrow the book
      * @param rowId
-     * @param result
+     * @param book
      * @constructor
      */
-    SetToDetailsRowMode(rowId, result) {
+    SetToDetailsRowMode(rowId, book) {
         const row = document.getElementById(rowId);
         row.innerHTML =
             `<td colspan="5">
-            <h3>${result.title}</h3>
-            <p><b>Author:</b> ${result.author}</p>
-            <p><b>Genre:</b> ${result.genre}</p>
-            <p><b>ISBN:</b> ${result.isbn}</p>
-            <p><b>Location:</b> ${result.location}</p>
-            <p><b>Description:</b> ${result.description}</p>
-            <p><b>Availability:</b> ${result.availability ? 'Yes' : 'No'}</p>
-            <button class="borrow-btn" data-row-id="${row.id}" data-book-id="${result.bookId}">Borrow</button>
-            <button class="exit-detail-view" data-row-id="${row.id}" data-book-id="${result.bookId}">Exit Detail View</button>
+                <h3>${book.title}</h3>
+                <p><b>Author:</b> ${book.author}</p>
+                <p><b>Genre:</b> ${book.genre}</p>
+                <p><b>ISBN:</b> ${book.isbn}</p>
+                <p><b>Location:</b> ${book.location}</p>
+                <p><b>Description:</b> ${book.description}</p>
+                <p><b>Availability:</b> ${book.availability ? 'Yes' : 'No'}</p>
+                <div class="d-flex align-items-center justify-content-around mb-1">                  
+                    <button id="borrow-btn-${rowId}" class="btn btn-primary borrow-btn" data-row-id="${row.id}" data-book-id="${book.bookId}">Borrow</button>        
+                    <button class="btn btn-danger exit-detail-view" data-row-id="${row.id}" data-book-id="${book.bookId}">Exit Detail View</button>                        
+                </div>
             </td>`
+        if (!book.availability) {
+            document.getElementById(`borrow-btn-${rowId}`).disabled = true;
+        }
     }
 
 }

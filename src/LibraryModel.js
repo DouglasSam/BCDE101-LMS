@@ -84,7 +84,7 @@ class HomeModel {
 /**
  * @class CatalogueManagementModel
  * @classdesc Handles the management of the catalogue
- * @property {Catalogue} catalogue - The catalogue object
+ * @property {Session} session - The session object containing the storage for the session
  * @property {number} #maxBookId - The maximum book id
  * @constructor - Creates a new CatalogueManagementModel
  * @author Samuel Douglas
@@ -94,8 +94,8 @@ class CatalogueManagementModel {
 
     #maxBookId = 0;
 
-    constructor(catalogue) {
-        this.catalogue = catalogue;
+    constructor(session) {
+        this.session = session;
         this.loadBooksFromStorage();
     }
 
@@ -103,7 +103,7 @@ class CatalogueManagementModel {
      * Clears all books from the catalogue. Irreversible.
      */
     clearAllBooks() {
-        this.catalogue = new Catalogue();
+        this.session.catalogue = new Catalogue();
         this.saveBooksToStorage();
     }
 
@@ -134,7 +134,7 @@ class CatalogueManagementModel {
      * Saves the books in the catalogue to local storage
      */
     saveBooksToStorage() {
-        localStorage.setItem('library_books', JSON.stringify(this.catalogue.getBooks()));
+        localStorage.setItem('library_books', JSON.stringify(this.session.catalogue.getBooks()));
     }
 
     /**
@@ -148,7 +148,7 @@ class CatalogueManagementModel {
      * @param availability - Whether the book is available
      */
     addBook(title, author, isbn, genre, location, description, availability = true) {
-        this.catalogue.addBook(this.#maxBookId++, title, author, isbn, availability, location, description, genre);
+        this.session.catalogue.addBook(this.#maxBookId++, title, author, isbn, availability, location, description, genre);
         this.saveBooksToStorage();
     }
 
@@ -165,7 +165,7 @@ class CatalogueManagementModel {
      * @param availability - Whether the book is available
      */
     updateBook(bookId, title, author, isbn, genre, location, description, availability) {
-        this.catalogue.updateBook(bookId, title, author, isbn, genre, location, description, availability)
+        this.session.catalogue.updateBook(bookId, title, author, isbn, genre, location, description, availability)
         this.saveBooksToStorage();
     }
 
@@ -174,7 +174,7 @@ class CatalogueManagementModel {
      * @param id - The id of the book to remove
      */
     removeBook(id) {
-        this.catalogue.deleteBook(id);
+        this.session.catalogue.deleteBook(id);
         this.saveBooksToStorage();
     }
 
@@ -195,7 +195,7 @@ class CatalogueManagementModel {
      * @returns {*} A list of the books that match the query or an empty list if none match
      */
     searchBooks(query) {
-        return this.catalogue.searchBooks(query);
+        return this.session.catalogue.searchBooks(query);
     }
 
     /**
@@ -203,7 +203,7 @@ class CatalogueManagementModel {
      * @returns {[]} A list of all the books in the catalogue
      */
     getBooks() {
-        return this.catalogue.getBooks();
+        return this.session.catalogue.getBooks();
     }
 
 }
@@ -355,7 +355,6 @@ class UserManagementModel {
      * Clears all users from the system. Irreversible.
      */
     clearAllUsers() {
-        //FIXME use the deleteUser() method in User and reset all borrowed books to available
         this.session.users.length = 0;
         this.maxUserId = this.#START_USER_ID;
         this.session.users.push(this.session.loggedInUser)
@@ -403,7 +402,7 @@ class BorrowRecordManagerModel {
 /**
  * @class SearchModel
  * @classdesc Handles the searching of books in the catalogue
- * @property {Catalogue} catalogue - The catalogue object
+ * @property {Session} session - The session containing storage for the session
  * @property {string} searchMode - The search mode that the user is using, simple or complex
  * @constructor - Creates a new SearchModel
  * @author Samuel Douglas
@@ -411,8 +410,8 @@ class BorrowRecordManagerModel {
  */
 class SearchModel {
 
-    constructor(catalogue) {
-        this.catalogue = catalogue;
+    constructor(session) {
+        this.session = session;
         this.searchMode = sessionStorage.getItem('searchMode') || "simple";
     }
 
@@ -442,7 +441,7 @@ class SearchModel {
      * @returns {*} A list of the books that match the query or an empty list if none match
      */
     searchBooks(query) {
-        return this.catalogue.searchBooks(query);
+        return this.session.catalogue.searchBooks(query);
     }
 
     /**
@@ -450,7 +449,7 @@ class SearchModel {
      * @returns {[]} A list of all the books in the catalogue
      */
     getBooks() {
-        return this.catalogue.getBooks();
+        return this.session.catalogue.getBooks();
     }
 
 }
