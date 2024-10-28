@@ -225,6 +225,9 @@ class UserManagementController {
         this.view = view;
     }
 
+    /**
+     * Sets the current view for the controller and adds all the button listeners
+     */
     setCurrentView() {
         this.view.render(this.model.session.users.length);
 
@@ -244,6 +247,9 @@ class UserManagementController {
 
     }
 
+    /**
+     * Add all button listeners for the page that are not initially rendered
+     */
     addButtonListeners() {
         const editButtons = document.querySelectorAll('.update-btn');
         editButtons.forEach(button => {
@@ -266,6 +272,10 @@ class UserManagementController {
         });
     }
 
+    /**
+     * EvenLister for cancel button in the edit view
+     * @param event - event for the listener
+     */
     handleCancelEdit(event) {
         event.preventDefault();
         const rowID = event.target.attributes.getNamedItem('data-row-id').value;
@@ -277,6 +287,10 @@ class UserManagementController {
         }
     }
 
+    /**
+     * EventListener for witching to edit mode
+     * @param event - event for the listener
+     */
     handleEditUser(event) {
         const rowID = event.target.getAttribute('data-row-id');
         const userId = event.target.getAttribute('data-user-id');
@@ -287,6 +301,10 @@ class UserManagementController {
         }
     }
 
+    /**
+     * EventListener for updating a user while in edit mode
+     * @param event - event for the listener
+     */
     handleUpdateUser(event) {
         event.preventDefault();
         const rowID = event.target.attributes.getNamedItem('data-row-id').value;
@@ -312,6 +330,10 @@ class UserManagementController {
         }
     }
 
+    /**
+     * EventListener for delete button when editing a user
+     * @param event - event for the listener
+     */
     handleRemoveUser(event) {
         event.preventDefault();
         const userId = event.target.attributes.item(2).value;
@@ -326,6 +348,10 @@ class UserManagementController {
         }
     }
 
+    /**
+     * EventListener for the search input on the page allowing the user to search
+     * for users by the name email or id
+     */
     handleSearch() {
         const query = document.getElementById('search').value;
         const filteredUsers = this.model.searchUsers(query);
@@ -333,6 +359,10 @@ class UserManagementController {
         this.addButtonListeners();
     }
 
+    /**
+     * EventListener for the form for adding a user to the system
+     * @param event - event for the listener
+     */
     handleAddUser(event) {
         event.preventDefault();
         const name = document.getElementById('full-name').value;
@@ -353,14 +383,22 @@ class UserManagementController {
         }
     }
 
+    /**
+     * EventListener for clearing all users from the system except for the logged-in user
+     * @param event - event for the listener
+     */
     handleResetUsers(event) {
         event.preventDefault();
-        if (confirm(`Are you sure you want to permanently delete ALL users?`)) {
+        if (confirm(`Are you sure you want to permanently delete ALL other users?\nThis is irreversible`)) {
             this.model.clearAllUsers();
             this.view.updateUserTable(this.model.session.users);
         }
     }
 
+    /**
+     * EventListener for loading the users from the starting data set
+     * @param event - event for the listener
+     */
     handleLoadUsersFromDataSet(event) {
         event.preventDefault();
         if (confirm(`Are you sure you want to replace ALL users with those defined in the starting data set?`)) {
@@ -394,13 +432,7 @@ class ReturnController {
         this.view.render();
 
     }
-
-    toggleSearchForm(event) {
-        event.preventDefault();
-        this.model.toggleSearchMode();
-        if (this.model.searchMode === 'simple') this.view.simpleSearch();
-        else this.view.complexSearch();
-    }
+    
 }
 
 /**

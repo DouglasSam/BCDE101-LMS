@@ -246,24 +246,34 @@ class User {
         return user;
     }
 
-    updateUser(name, email, password, role, membershipId = undefined, borrowedBooks = undefined) {
-        this.#name = name;
-        this.#email = email;
-        if (password !== "")
-        this.#password = password;
-        if (role.toLowerCase() === 'member') {
-            if (membershipId !== undefined) {
-                this.membershipId = membershipId;
-            }
-            if (borrowedBooks !== undefined) {
-                this.borrowedBooks = borrowedBooks;
+    /**
+     * Updates this user with the provided details 
+     * @param newName - The new name of the user
+     * @param newEmail - The new email of the user
+     * @param newPassword - The new password, or blank string to not update
+     * @param role - The role of the user, either 'Member' or 'Librarian'
+     * @param newMembershipId - The new membership id of the member (otherwise undefined) if Librarian
+     */
+    updateUser(newName, newEmail, newPassword, role, newMembershipId = undefined) {
+        this.#name = newName;
+        this.#email = newEmail;
+        if (newPassword !== "")
+        this.#password = newPassword;
+        if (this instanceof Member) {
+            if (newMembershipId !== undefined) {
+                this._membershipId = newMembershipId;
             }
         }
 
     }
 
+    /**
+     * Makes sure the user is ready to be deleted
+     */
     deleteUser() {
-
+        if (this instanceof Member) {
+            this.borrowedBooks.forEach(book => this.returnBook(book));
+        }
     }
 
     /**
@@ -277,18 +287,34 @@ class User {
         return this.#email === email && this.#password === password;
     }
 
+    /**
+     * Gets the user id
+     * @returns {*}
+     */
     get userId() {
         return this.#userId;
     }
 
+    /**
+     * Gets the full name of the user
+     * @returns {*}
+     */
     get name() {
         return this.#name;
     }
 
+    /**
+     * Gets the email of the user
+     * @returns {*}
+     */
     get email() {
         return this.#email;
     }
 
+    /**
+     * Gets the role of the user
+     * @returns {*}
+     */
     get role() {
         return this.#role;
     }
@@ -296,7 +322,7 @@ class User {
 
     /**
      * This is the equivalent of saving data to database.
-     * @returns {{password, role, name, publicKey, userId, email}} The user object as a JSON object
+     * @returns {userId, name, email, role, password} The user object as a JSON object
      */
     get JSONObject() {
 
@@ -309,23 +335,17 @@ class User {
         };
 
     }
-
-    /**
-     * This is the equivalent of reading data from a database.
-     * Used for loading from local storage
-     * @param obj
-     * @constructor
-     */
-    set JSONObject(obj) {
-        this.#userId = obj.userId;
-        this.#name = obj.name;
-        this.#email = obj.email;
-        this.#role = obj.role;
-        this.#password = obj.password;
-    }
+    
 }
 
-
+/**
+ * @class Member
+ * @classdesc Represents a member in the library system
+ * @property {number} #membershipId - The membership id of the member
+ * @property {Book[]} #borrowedBooks - The books the member has borrowed
+ * @constructor - Creates a new member
+ * @extends User
+ */
 class Member extends User {
 
     #membershipId;
@@ -339,35 +359,66 @@ class Member extends User {
         this.#borrowedBooks = borrowedBooks;
     }
 
+    /**
+     * Adds a book to the borrowed books of the member if the book is available
+     * @param book - The book to be borrowed
+     * @returns {boolean} Returns true if the book was borrowed, false if it was not
+     */
     borrowBook(book) {
 
     }
 
+    /**
+     * Returns a book from the borrowed books of the member
+     * @param book - The book to be returned
+     */
     returnBook(book) {
 
     }
 
+    /**
+     * Checks the borrowing status of all books of the member 
+     */
     checkBorrowingStatus() {
 
     }
 
-
+    /**
+     * Gets the membership id of the member
+     * @returns {*}
+     */
     get membershipId() {
         return this.#membershipId;
     }
 
-    set membershipId(value) {
+    /**
+     * Sets the membership id of the member
+     * @param value
+     */
+    set _membershipId(value) {
         this.#membershipId = value;
     }
 
+    /**
+     * Gets the borrowed books of the member
+     * @returns {*}
+     */
     get borrowedBooks() {
         return this.#borrowedBooks;
     }
 
+    /**
+     * Sets the borrowed books of the member
+     * @param value
+     */
     set borrowedBooks(value) {
         this.#borrowedBooks = value;
     }
 
+    /**
+     * Adds to the super get JSONObject with member only fields
+     * @returns {userId, name, email, role, password, membershipId, borrowedBooks} The member object as a JSON object
+     */
     get JSONObject() {
         const obj = super.JSONObject;
         obj.membershipId = this.#membershipId;
@@ -376,7 +427,13 @@ class Member extends User {
     }
 }
 
-
+/**
+ * @class Librarian
+ * @classdesc Represents a librarian in the library system
+ * @constructor - Creates a new librarian
+ * @extends User
+ * 
+ */
 class Librarian extends User {
 
     constructor(userId, name, email, password) {
@@ -394,14 +451,14 @@ class Librarian extends User {
     deleteBook(book) {
 
     }
-
-
+    
+    
     registerUser(userId, name, email, password, role, membershipId = undefined, borrowedBooks=[]) {
         return super.registerUser(userId, name, email, password, role, membershipId, borrowedBooks);
     }
 
-    updateUser(name, email, password, role, membershipId = undefined, borrowedBooks = undefined) {
-        super.updateUser(name, email, password, role, membershipId, borrowedBooks);
+    updateUser(name, email, password, role, membershipId = undefined) {
+        super.updateUser(name, email, password, role, membershipId);
     }
 
     deleteUser() {

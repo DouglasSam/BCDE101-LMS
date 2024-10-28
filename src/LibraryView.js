@@ -281,6 +281,10 @@ class UserManagementView {
         
     }
 
+    /**
+     * Updates the table of users with the list of users provided
+     * @param users - The list of users to update the table with
+     */
     updateUserTable(users) {
         this.tableCount.innerHTML = `Showing ${users.length} users from the system`;
         this.userTableBody.innerHTML = '';
@@ -312,6 +316,11 @@ class UserManagementView {
             `
     }
 
+    /**
+     * Changes the row to the edit mode with a form to update the user details
+     * @param rowId - The id of the row to change to the update form
+     * @param user - The user that to get the details from and will be updated or deleted
+     */
     setToEditMode(rowId, user) {
         document.getElementById(rowId).innerHTML = `
         <td colspan="6">
@@ -608,7 +617,8 @@ class SearchView {
 class HomeView {
 
     /**
-     *
+     * Renders the home page, will display a welcome message if a user is logged in
+     * otherwise will display a login form
      * @param loggedInUser
      */
     render(loggedInUser) {
