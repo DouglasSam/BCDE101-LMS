@@ -141,5 +141,126 @@ describe("Library Management System", () => {
             
         });
 
+        it("should be able to load data from the data set", async () => {
+            expect(userModel.session.users.length).toBe(2);
+            expect(userModel.session.users[0].name).toBe("admin");
+            expect(userModel.session.users[1].name).toBe("admin2");
+            // console.log(userModel.session.loggedInUser)
+            await userModel.resetUsersFromDataSet();
+            expect(userModel.session.users.length).toBe(101);
+            expect(userModel.session.users[0]).toBe(user1);
+            expect(userModel.session.users[1].name).toBe('Henry Le');
+
+        });
+        
+        it("should be able to search and return correct results", async () => {
+            await userModel.resetUsersFromDataSet();
+            // search by name
+            let searchResults = userModel.searchUsers('Henry');
+            expect(searchResults.length).toBe(2);
+            // search by email domain
+            searchResults = userModel.searchUsers('google');
+            expect(searchResults.length).toBe(16);
+            //search by id
+            //every id has a 1 with the base dataset
+            searchResults = userModel.searchUsers('1');
+            expect(searchResults.length).toBe(101);
+            searchResults = userModel.searchUsers('99');
+            expect(searchResults.length).toBe(1);
+            expect(searchResults[0].name).toBe('Lesley Trujillo');
+        });
+
+        
+        it ("should be able to update a user successfully", async () => {
+            await userModel.resetUsersFromDataSet();
+            // update a librarian
+            // chosen librarian
+            // "name": "Dieter Britt",
+            //     "email": "dieterbritt@aol.com",
+            //     "password": "BHO22SLW1MC",
+            //     "role": "librarian"
+            let user = userModel.getUserByEmail("dieterbritt@aol.com");
+            let userId = user.userId;
+            let newName = "Changed Name";
+            let newEmail = user.email;
+            let newPassword = "";
+            let newRole = "Librarian";
+            let newUser = userModel.updateUser(userId, newName, newEmail, newPassword, newRole);
+            expect(newUser.name).toBe(newName);
+            expect(newUser.email).toBe(newEmail);
+            expect(newUser.checkCredentials(newEmail, newPassword)).toBeFalse();
+            expect(newUser.role).toBe(newRole);
+            expect(newUser.userId).toBe(userId);
+            expect(newUser.membershipId).toBe(undefined);
+            // update everything for a librarian
+            // chosen librarian
+            // "name": "Oleg Pace",
+            // 		"email": "olegpace@aol.ca",
+            // 		"password": "MYP46WDP3FG",
+            // 		"role": "librarian"
+            user = userModel.getUserByEmail("olegpace@aol.ca");
+            userId = user.userId;
+            newName = "Test changed";
+            newEmail = 'test@test.com';
+            newPassword = "asdf";
+            newRole = "Librarian";
+            newUser = userModel.updateUser(userId, newName, newEmail, newPassword, newRole);
+            expect(newUser.name).toBe(newName);
+            expect(newUser.email).toBe(newEmail);
+            expect(newUser.checkCredentials(newEmail, newPassword)).toBeTrue();
+            expect(newUser.role).toBe(newRole);
+            expect(newUser.userId).toBe(userId);
+            expect(newUser.membershipId).toBe(undefined);
+            //Cannot change to an email that already exists
+            // chosen librarian:
+            // "name": "Basia Shaffer",
+            //     "email": "basiashaffer@outlook.edu",
+            //     "password": "YKQ76IVJ4UK",
+            //     "role": "librarian"
+            user = userModel.getUserByEmail("basiashaffer@outlook.edu");
+            userId = user.userId;
+            newName = "Test changed";
+            newEmail = 'test@test.com';
+            newPassword = "asdf";
+            newRole = "Librarian";
+            newUser = userModel.updateUser(userId, newName, newEmail, newPassword, newRole);
+            expect(newUser).toBeFalse();
+            //Edit a member
+            // chosen member:
+            // "name": "Ezekiel Snow",
+            // 		"email": "ezekielsnow@yahoo.ca",
+            // 		"password": "EHW54IDU9SO",
+            // 		"role": "member"
+            user = userModel.getUserByEmail("ezekielsnow@yahoo.ca");
+            userId = user.userId;
+            newName = "member change";
+            newEmail = 'test@member.com';
+            newPassword = "asdf";
+            newRole = "Member";
+            let newMembershipId = "1234";
+            newUser = userModel.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
+            expect(newUser.name).toBe(newName);
+            expect(newUser.email).toBe(newEmail);
+            expect(newUser.checkCredentials(newEmail, newPassword)).toBeTrue();
+            expect(newUser.role).toBe(newRole);
+            expect(newUser.userId).toBe(userId);
+            expect(newUser.membershipId).toBe(newMembershipId);
+            //cannot have the same membershipId
+            // "name": "Boris Hudson",
+            //     "email": "borishudson5804@outlook.com",
+            //     "password": "VLO96EIL7HW",
+            //     "role": "member"
+            user = userModel.getUserByEmail("borishudson5804@outlook.com");
+            userId = user.userId;
+            newName = "Boris Hudson";
+            newEmail = 'borishudson5804@outlook.com';
+            newPassword = "";
+            newRole = "Member";
+            newMembershipId = "1234";
+            newUser = userModel.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
+            expect(newUser).toBeFalse();
+
+            
+        });
     });
 });

@@ -35,11 +35,11 @@ class HomeModel {
         localStorage.setItem('loggedInUser', JSON.stringify(this.session.loggedInUser.email));
     }
 
-    async logInUser(email, password, rememberMe) {
+    logInUser(email, password, rememberMe) {
+        console.log(this.session.users)
         const user = this.getUserByEmail(email);
         if (user) {
-            const encryptedEnteredPassword = await Session.encrypt(password, user.publicKey);
-            const valid = await user.checkCredentials(email, encryptedEnteredPassword)
+            const valid = user.checkCredentials(email, password)
             if (valid) {
                 this.session.loggedInUser = user;
                 if (rememberMe)
@@ -47,6 +47,7 @@ class HomeModel {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -205,18 +206,40 @@ class UserManagementModel {
         
     }
 
+    updateUser(userId, name, email, password, role, membershipId=undefined) {
+        const user = this.getUserByID(userId);
+        if (user === null) return false;
+        if (email !== user.email && this.getUserByEmail(email) !== null) return false
+        if (membershipId !== undefined && this.session.users.filter(user => user.membershipId === membershipId).length > 0) return false;
+        user.updateUser(name, email, password, role, membershipId);
+        if (this.session.loggedInUser.userId === userId) this.session.loggedInUser = user;
+        this.saveUsersToStorage();
+        return user;
+    }
+
     getUserByEmail(email) {
         const filtered = this.session.users.filter(user => user.email === email);
         return filtered.length === 1 ? filtered[0] : null;
     }
+    
+    getUserByID(userId) {
+        const filtered = this.session.users.filter(user => user.userId.toString() === userId.toString());
+        return filtered.length === 1 ? filtered[0] : null;
+    }
+    
+    searchUsers(query) {
+        return this.session.users.filter(user => user.name.includes(query) || user.email.includes(query) || user.userId.toString().includes(query));
+    }
 
     loadUsersFromStorage() {
         const loggedIn = this.session.loggedInUser;
-        this.session.loggedInUser = new Librarian(1, 'system', 'system@system', 'system');
+        this.session.loggedInUser = new Librarian(0, 'system', 'system@system', 'system');
         let usersJSON = localStorage.getItem('library_users');
         let users = usersJSON ? JSON.parse(usersJSON) : [];
         this.#loadFromArray(users);
-        this.session.loggedInUser = loggedIn;``
+        // let admin = this.getUserByID(1);
+        // console.log(admin);
+        this.session.loggedInUser = loggedIn;
     }
 
     saveUsersToStorage() {
@@ -241,6 +264,7 @@ class UserManagementModel {
 
     #loadFromArray(users) {
         users.forEach(user => {
+            if (user.userId === 1) this.updateUser(1, user.name, user.email, user.password, user.role);
             this.addUser(user.name, user.email, user.password, user.role, user.userId);
         });
     }
@@ -249,9 +273,10 @@ class UserManagementModel {
         const userFetch = await fetch("./src/lib/Users.json");
         let users = [];
         if (userFetch.ok) {
+            this.clearAllUsers();
             users = await userFetch.json();
+            this.#loadFromArray(users);
         }
-        this.#loadFromArray(users);
     }
 
 }

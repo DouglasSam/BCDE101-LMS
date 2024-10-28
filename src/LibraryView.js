@@ -73,7 +73,6 @@ class CatalogueManagementView {
         <table id="book-table" class="table table-striped">
             <thead>
                 <tr>
-<!--                TODO add book id-->
                     <th>Title</th>
                     <th>Author</th>
                     <th>ISBN</th>
@@ -215,7 +214,7 @@ class UserManagementView {
     /**
      * Renders the base view
      */
-    render() {
+    render(numUsers) {
         document.getElementById("main").innerHTML =
             `
         <h2>Add a User</h2>
@@ -255,11 +254,11 @@ class UserManagementView {
               <button type="submit" class="btn btn-primary">Register User</button>
             </form>
 
-        <h2>Search Users</h2>
-        <input type="text" id="search" placeholder="Search by name, email, or id">
+        <h2>Filter Users</h2>
+        <input type="text" id="search" class="w-100" placeholder="Filter by name, email, or id">
         
-        <h2>Users in System</h2>
-        <h3 id="num-users"></h3>
+        <h2>There are ${numUsers} users in System</h2>
+        <h3 id="users-shown"></h3>
         <table id="user-table" class="table table-striped">
             <thead>
                 <tr>
@@ -276,13 +275,13 @@ class UserManagementView {
         </table>
             `
         this.userTableBody = document.querySelector('#user-table tbody');
-        this.userCount = document.getElementById('num-users');
+        this.tableCount = document.getElementById('users-shown');
         
         
     }
 
     updateUserTable(users) {
-        this.userCount.innerHTML = `There are ${users.length} in the system at the moment`;
+        this.tableCount.innerHTML = `Showing ${users.length} users from the system`;
         this.userTableBody.innerHTML = '';
         let rowNum = 1;
         users.forEach(user => {
@@ -336,8 +335,8 @@ class UserManagementView {
                     <div class="flex-fill">
                         <label for="role-${rowId}" class="form-label">Role:</label>
                         <select class="form-select" id="role-${rowId}" disabled>
-                            <option value="librarian" ${user.role === "librarian" ? "selected" : ""}>Librarian</option>
-                            <option value="member" ${user.role === "member" ? "selected" : ""}>Member</option>
+                            <option value="librarian" ${user.role === "Librarian" ? "selected" : ""}>Librarian</option>
+                            <option value="member" ${user.role === "Member" ? "selected" : ""}>Member</option>
                         </select>
                     </div>
                 </div>

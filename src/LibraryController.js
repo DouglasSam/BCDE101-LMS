@@ -226,7 +226,7 @@ class UserManagementController {
     }
 
     setCurrentView() {
-        this.view.render();
+        this.view.render(this.model.session.users.length);
 
         const dataSetButton = document.getElementById('dataSet');
         const resetButton = document.getElementById('reset');
@@ -270,30 +270,38 @@ class UserManagementController {
         event.preventDefault();
         const rowID = event.target.attributes.getNamedItem('data-row-id').value;
         const userId = event.target.attributes.getNamedItem('data-user-id').value;
-        const user = this.model.searchUsers({userId: userId})[0];
-        this.view.SetToRowMode(rowID, user);
-        this.addButtonListeners();
+        const user = this.model.getUserByID(userId);
+        if (user) {
+            this.view.SetToRowMode(rowID, user);
+            this.addButtonListeners();
+        }
     }
 
     handleEditUser(event) {
         const rowID = event.target.getAttribute('data-row-id');
         const userId = event.target.getAttribute('data-user-id');
-        const user = this.model.searchUsers({userId: userId})[0];
-        this.view.setToEditMode(rowID, user);
-        this.addButtonListeners();
+        const user = this.model.getUserByID(userId);
+        if (user) {
+            this.view.setToEditMode(rowID, user);
+            this.addButtonListeners();
+        }
     }
 
     handleUpdateUser(event) {
         event.preventDefault();
         const rowID = event.target.attributes.getNamedItem('data-row-id').value;
         const userId = event.target.attributes.getNamedItem('data-user-id').value;
-        const newName = document.getElementById(`name-${rowID}`).value;
+        const newName = document.getElementById(`full-name-${rowID}`).value;
         const newEmail = document.getElementById(`email-${rowID}`).value;
         const newPassword = document.getElementById(`password-${rowID}`).value;
         const newRole = document.getElementById(`role-${rowID}`).value;
-        const newMembershipId = document.getElementById(`membershipId-${rowID}`).value;
-        this.model.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
-        const newUser = this.model.searchUsers({userId: userId})[0];
+        let newMembershipId
+        if (newRole === 'member') {
+            newMembershipId = document.getElementById(`membershipId-${rowID}`).value;
+        } else {
+            newMembershipId = undefined;
+        }
+        const newUser = this.model.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
         this.view.SetToRowMode(rowID, newUser);
         this.addButtonListeners();
     }
@@ -311,7 +319,7 @@ class UserManagementController {
 
     handleSearch() {
         const query = document.getElementById('search').value;
-        const filteredUsers = this.model.searchUsers({query: query});
+        const filteredUsers = this.model.searchUsers(query);
         this.view.updateUserTable(filteredUsers);
         this.addButtonListeners();
     }
@@ -347,7 +355,7 @@ class UserManagementController {
     handleLoadUsersFromDataSet(event) {
         event.preventDefault();
         if (confirm(`Are you sure you want to replace ALL users with those defined in the starting data set?`)) {
-            this.model.clearAllUsers();
+            
             this.model.resetUsersFromDataSet().then(() => {
                 this.view.updateUserTable(this.model.session.users);
                 this.addButtonListeners();
@@ -618,7 +626,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Creates the default user of admin, will update name, and password if list of users exist in local storage
     if (session.users.length === 0) {
-        const admin = new Librarian(1, 'admin', 'admin@admin');
+        const admin = new Librarian(1, 'admin', 'admin@admin', "admin");
         session.users.push(admin);
     }
 

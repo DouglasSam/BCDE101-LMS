@@ -246,7 +246,19 @@ class User {
         return user;
     }
 
-    updateUser() {
+    updateUser(name, email, password, role, membershipId = undefined, borrowedBooks = undefined) {
+        this.#name = name;
+        this.#email = email;
+        if (password !== "")
+        this.#password = password;
+        if (role.toLowerCase() === 'member') {
+            if (membershipId !== undefined) {
+                this.membershipId = membershipId;
+            }
+            if (borrowedBooks !== undefined) {
+                this.borrowedBooks = borrowedBooks;
+            }
+        }
 
     }
 
@@ -323,6 +335,8 @@ class Member extends User {
         super(userId, name, email, password, 'Member');
         this.#membershipId = membershipId;
         this.#borrowedBooks = borrowedBooks;
+        this._membershipId = membershipId;
+        this._borrowedBooks = borrowedBooks;
     }
 
     borrowBook(book) {
@@ -335,6 +349,23 @@ class Member extends User {
 
     checkBorrowingStatus() {
 
+    }
+
+
+    get membershipId() {
+        return this.#membershipId;
+    }
+
+    set membershipId(value) {
+        this.#membershipId = value;
+    }
+
+    get borrowedBooks() {
+        return this.#borrowedBooks;
+    }
+
+    set borrowedBooks(value) {
+        this.#borrowedBooks = value;
     }
 
     get JSONObject() {
@@ -369,8 +400,8 @@ class Librarian extends User {
         return super.registerUser(userId, name, email, password, role, membershipId, borrowedBooks);
     }
 
-    updateUser() {
-        super.updateUser();
+    updateUser(name, email, password, role, membershipId = undefined, borrowedBooks = undefined) {
+        super.updateUser(name, email, password, role, membershipId, borrowedBooks);
     }
 
     deleteUser() {
