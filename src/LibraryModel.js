@@ -36,7 +36,6 @@ class HomeModel {
     }
 
     logInUser(email, password, rememberMe) {
-        console.log(this.session.users)
         const user = this.getUserByEmail(email);
         if (user) {
             const valid = user.checkCredentials(email, password)
