@@ -9,7 +9,8 @@
  */
 class CatalogueManagementModel {
 
-    #maxBookId = 0;
+    static #START_BOOK_ID = 8500
+    #maxBookId = CatalogueManagementModel.#START_BOOK_ID;
 
     constructor(session) {
         this.session = session;
@@ -44,7 +45,7 @@ class CatalogueManagementModel {
     loadBooksFromStorage() {
         let booksJSON = localStorage.getItem('library_books');
         let books = booksJSON ? JSON.parse(booksJSON) : [];
-        books.forEach(book => this.session.catalogue.addBook(book.bookId, book.title, book.author, book.isbn, book.genre, book.location, book.description, book.availability));
+        books.forEach(book => this.session.catalogue.addBook(book.bookId, book.title, book.author, book.isbn, book.availability, book.location, book.description, book.genre));
     }
 
     /**
