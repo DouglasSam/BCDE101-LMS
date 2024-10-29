@@ -28,7 +28,7 @@ class UserManagementModel {
         if (user === null) return false;
         if (this.session.loggedInUser.userId === user.userId) return false;
         this.session.users = this.session.users.filter(u => u.userId !== user.userId);
-        this.saveUsersToStorage();
+        this.session.saveUsersToStorage();
         return true;
     }
 
@@ -52,7 +52,7 @@ class UserManagementModel {
         }).length > 0) return false;
         user.updateUser(newName, newEmail, newPassword, role, newMembershipId);
         if (this.session.loggedInUser.userId === userId) this.session.loggedInUser = user;
-        this.saveUsersToStorage();
+        this.session.saveUsersToStorage();
         return user;
     }
 
@@ -110,13 +110,7 @@ class UserManagementModel {
         //
     }
 
-    /**
-     * Saves the users in the session to local storage
-     */
-    saveUsersToStorage() {
-        let usersJSON = JSON.stringify(this.session.users.map(user => user.JSONObject));
-        localStorage.setItem('library_users', usersJSON);
-    }
+
 
     /**
      * Adds a user to the system, each user must have unique userId, email and members must have unique membershipId
@@ -136,7 +130,7 @@ class UserManagementModel {
         while (this.getUserByID(userId) !== null) userId = this.maxUserId++
         if (membershipId === undefined) membershipId = userId;
         this.session.users.push(this.session.loggedInUser.registerUser(userId, name, email, password, role, membershipId, borrowedBooks));
-        this.saveUsersToStorage();
+        this.session.saveUsersToStorage();
         return true;
     }
 

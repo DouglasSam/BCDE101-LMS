@@ -21,7 +21,7 @@ class CatalogueManagementModel {
      */
     clearAllBooks() {
         this.session.catalogue = new Catalogue();
-        this.saveBooksToStorage();
+        this.session.saveBooksToStorage();
     }
 
     /**
@@ -44,14 +44,7 @@ class CatalogueManagementModel {
     loadBooksFromStorage() {
         let booksJSON = localStorage.getItem('library_books');
         let books = booksJSON ? JSON.parse(booksJSON) : [];
-        books.forEach(book => this.addBook(book.title, book.author, book.isbn, book.genre, book.location, book.description, book.availability));
-    }
-
-    /**
-     * Saves the books in the catalogue to local storage
-     */
-    saveBooksToStorage() {
-        localStorage.setItem('library_books', JSON.stringify(this.session.catalogue.getBooks()));
+        books.forEach(book => this.session.catalogue.addBook(book.bookId, book.title, book.author, book.isbn, book.genre, book.location, book.description, book.availability));
     }
 
     /**
@@ -66,7 +59,7 @@ class CatalogueManagementModel {
      */
     addBook(title, author, isbn, genre, location, description, availability = true) {
         this.session.catalogue.addBook(this.#maxBookId++, title, author, isbn, availability, location, description, genre);
-        this.saveBooksToStorage();
+        this.session.saveBooksToStorage();
     }
 
     /**
@@ -83,7 +76,7 @@ class CatalogueManagementModel {
      */
     updateBook(bookId, title, author, isbn, genre, location, description, availability) {
         this.session.catalogue.updateBook(bookId, title, author, isbn, genre, location, description, availability)
-        this.saveBooksToStorage();
+        this.session.saveBooksToStorage();
     }
 
     /**
@@ -92,7 +85,7 @@ class CatalogueManagementModel {
      */
     removeBook(id) {
         this.session.catalogue.deleteBook(id);
-        this.saveBooksToStorage();
+        this.session.saveBooksToStorage();
     }
 
     /**

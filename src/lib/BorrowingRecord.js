@@ -12,13 +12,16 @@ class BorrowingRecord {
     #returnDate
     #status
 
-    constructor(recordId, borrowedBook, borrower, borrowDate, dueDate, status) {
+    constructor(recordId, borrowedBook, borrower, borrowDate, dueDate, status, returnDate = undefined) {
         this.#recordId = recordId;
         this.#borrowedBook = borrowedBook;
         this.#borrower = borrower;
         this.#borrowDate = borrowDate;
         this.#dueDate = dueDate;
         this.#status = status;
+        if (returnDate !== undefined) {
+            this.#returnDate = returnDate;
+        }
     }
 
     static createRecord(session, borrowedBookId, borrowerId) {
@@ -36,6 +39,10 @@ class BorrowingRecord {
         book.toggleAvailability();
         user.borrowBook(book);
         session.borrowingRecords.push(record);
+        // Save borrowing record, books and users to storage as they have all been modified
+        session.saveBorrowingRecordsToStorage();
+        session.saveBooksToStorage();
+        session.saveUsersToStorage();
         return true;
     }
 
@@ -47,8 +54,19 @@ class BorrowingRecord {
 
     }
 
+    get recordJSON() {
+        return {
+            recordId: this.#recordId,
+            borrowedBook: this.#borrowedBook.viewBookDetails().bookId,
+            borrower: this.#borrower.membershipId,
+            borrowDate: this.#borrowDate,
+            returnDate: this.#returnDate,
+            dueDate: this.#dueDate,
+            status: this.#status
+        }
+    }
+    
     get recordDetails() {
-        console.log(this)
         return {
             recordId: this.#recordId,
             borrowedBook: this.#borrowedBook,

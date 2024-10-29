@@ -130,7 +130,7 @@ describe("Library Management System", () => {
         });
 
         it("should save users to local Storage", () => {
-            userModel.saveUsersToStorage();
+            userModel.session.saveUsersToStorage();
             let originalStorage = localStorage.getItem("library_users");
             userModel.clearAllUsers();
             expect(userModel.session.users.length).toBe(1);

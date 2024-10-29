@@ -27,6 +27,31 @@ class Session {
         );
         return filtered.length === 1 ? filtered[0] : null;
     }
+
+    /**
+     * Saves the books in the catalogue to local storage
+     */
+    saveBooksToStorage() {
+        localStorage.setItem('library_books', JSON.stringify(this.catalogue.getBooks()));
+    }
+
+    /**
+     * Saves the users in the session to local storage
+     */
+    saveUsersToStorage() {
+        let usersJSON = JSON.stringify(this.users.map(user => user.JSONObject));
+        localStorage.setItem('library_users', usersJSON);
+    }
+    
+    /**
+     * Saves the borrowing records in the session to local storage
+     */
+    saveBorrowingRecordsToStorage() {
+        let recordsJSON = JSON.stringify(this.borrowingRecords.map(record => record.recordJSON));
+        // console.log(recordsJSON);
+        localStorage.setItem('library_borrowing_records', recordsJSON);
+    }
+    
 }
 
 
@@ -62,10 +87,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(session), new CatalogueManagementView()));
-    controllers.set('borrow-record-management', new BorrowRecordManagerController(new BorrowRecordManagerModel(session), new BorrowRecordManagerView()));
     controllers.set('catalogue-search', new SearchController(new SearchModel(session), new SearchView()));
     controllers.set('user-management', new UserManagementController(userManagementModel, new UserManagementView()));
     controllers.set('home', new HomeController(homeModel, new HomeView()));
+    controllers.set('borrow-record-management', new BorrowRecordManagerController(new BorrowRecordManagerModel(session), new BorrowRecordManagerView()));
     let currentPage = sessionStorage.getItem('currentPage');
     if (!currentPage) {
         currentPage = 'home';
