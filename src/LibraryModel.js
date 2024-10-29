@@ -282,8 +282,7 @@ class UserManagementModel {
      * @returns {User|null} - The user object or null if not found
      */
     getUserByID(userId) {
-        const filtered = this.session.users.filter(user => user.userId.toString() === userId.toString());
-        return filtered.length === 1 ? filtered[0] : null;
+        return this.session.getUserByID(userId);
     }
 
     /**
@@ -450,6 +449,12 @@ class SearchModel {
      */
     getBooks() {
         return this.session.catalogue.getBooks();
+    }
+    
+    borrowBook(book, userId) {
+        const borrowerRecord = BorrowingRecord.createRecord(this.session, book.bookId, userId);
+        return borrowerRecord !== false;
+
     }
 
 }

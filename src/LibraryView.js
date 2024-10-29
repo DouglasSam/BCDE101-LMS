@@ -420,6 +420,8 @@ class SearchView {
      */
     render(numBooks, searchMode) {
         document.getElementById("main").innerHTML =`
+
+            <div id="borrow-modal" hidden></div>
             <h2>Search our catalogue</h2>
             <h3>${numBooks} books available to search through.</h3>
             <p>Use form below to get searching<br>
@@ -450,6 +452,7 @@ class SearchView {
         this.searchResults = document.getElementById("search-results");
         this.searchTitle = document.getElementById("search-title");
         this.bookTableBody = document.querySelector('#book-table tbody');
+        this.borrowModalDiv = document.getElementById("borrow-modal");
         searchMode === "simple" ? this.simpleSearch() : this.complexSearch();
     }
 
@@ -476,6 +479,38 @@ class SearchView {
             </form>
             `;
 
+    }
+    
+    borrowModal(book, rowId) {
+        this.borrowModalDiv.hidden = false;
+        this.borrowModalDiv.innerHTML = `
+            <dialog id="borrow-dialog">
+                <h2>You are loaning out ${book.title}</h2>
+                <h3>Enter a membership ID below to load it to that member</h3>
+               <form id="borrow-form" data-book-id="${book.bookId}" data-row-id="${rowId}">
+                  <div class="row mb-3">
+                    <label for="loan-membership-id" class="col-4 col-form-label">Membership ID:</label>
+                    <div class="col-8">
+                      <input type="number" class="form-control" id="loan-membership-id" placeholder="Membership ID" required>
+                    </div>
+                  </div>
+                  <button id="loan-book" type="submit" class="btn btn-primary">Loan to Member</button>
+                </form>
+            </dialog>
+`
+        const borrowModal = document.getElementById("borrow-dialog");
+        borrowModal.showModal();
+
+    }
+    
+    changeToSuccessModel(book, membershipId) {
+        const modal = document.getElementById("borrow-dialog");
+        if (modal === null) return;
+        modal.innerHTML = `
+            <h2>Success</h2>
+            <p>"${book.title}" has been loaned to member with membership ID: ${membershipId}</p>
+            <button id="close-modal" class="btn btn-primary">Close</button>
+        `
     }
 
     /**
@@ -603,7 +638,7 @@ class SearchView {
                 <p><b>Availability:</b> ${book.availability ? 'Yes' : 'No'}</p>
                 <div class="d-flex align-items-center justify-content-around mb-1">                  
                     <button id="borrow-btn-${rowId}" class="btn btn-primary borrow-btn" data-row-id="${row.id}" data-book-id="${book.bookId}">Borrow</button>        
-                    <button class="btn btn-danger exit-detail-view" data-row-id="${row.id}" data-book-id="${book.bookId}">Exit Detail View</button>                        
+                    <button class=" btn btn-danger exit-detail-view" data-row-id="${row.id}" data-book-id="${book.bookId}">Exit Detail View</button>                        
                 </div>
             </td>`
         if (!book.availability) {

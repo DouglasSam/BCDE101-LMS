@@ -480,7 +480,7 @@ class SearchController {
 
         const borrowButtons = document.querySelectorAll('.borrow-btn');
         borrowButtons.forEach(button => {
-            button.addEventListener('click', this.handleBorrow.bind(this));
+            button.addEventListener('click', this.handleBorrowModal.bind(this));
         });
 
         if (this.model.searchMode === 'simple') {
@@ -521,11 +521,31 @@ class SearchController {
      * EventListener that will handle a user borrowing a book
      * @param event - event for the listener
      */
-    handleBorrow(event) {
+    handleBorrowModal(event) {
         const id = event.target.getAttribute('data-book-id');
         const rowId = event.target.getAttribute('data-row-id');
-        //TODO
-        console.log(`Borrowing book ${id} from row ${rowId}`);
+        const book = this.model.searchBooks({id: id})[0];
+        this.view.borrowModal(book, rowId);
+        document.getElementById('borrow-form').addEventListener('submit', this.handleBorrow.bind(this));
+    }
+    
+    handleBorrow(event) {
+        event.preventDefault();
+        const memberId = document.getElementById('loan-membership-id').value;
+        const bookId = event.target.attributes.getNamedItem('data-book-id').value;
+        const rowId = event.target.attributes.getNamedItem('data-row-id').value;
+        const book = this.model.searchBooks({id: bookId})[0];
+        if (this.model.borrowBook(book, memberId)) {
+            this.view.changeToSuccessModel(book, memberId);
+            document.getElementById("close-modal").addEventListener('click', (event) => {
+                event.preventDefault();
+                document.getElementById("borrow-dialog").close();
+                const newBook = this.model.searchBooks({id: bookId})[0];
+                this.view.setToNormalRowMode(rowId, newBook);
+                this.handleButtonListeners();
+            });
+        }
+        
     }
 
     /**

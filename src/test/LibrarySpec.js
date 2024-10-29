@@ -263,4 +263,25 @@ describe("Library Management System", () => {
             
         });
     });
+
+    describe("borrowing", () => {
+        let session, searchModel;
+
+        beforeEach(() => {
+            session = new Session();
+            searchModel = new SearchModel(session);
+            session.users.push(new Member(1, 'test', 'test', 'test', '1234'));
+            session.catalogue.addBook(1, "JavaScript: The Good Parts", "Douglas Crockford", "9780596517748");
+        });
+
+        it("should be able to borrow a book", () => {
+            const book = searchModel.searchBooks({id: 1})[0];
+            let borrowRecord = searchModel.borrowBook(book, 1234);
+            expect(borrowRecord).toBeTrue();
+            expect(session.borrowingRecords.length).toBe(1)
+            expect(searchModel.searchBooks({id: 1})[0].availability).toBeFalse();
+            expect(session.users[0].borrowedBooks.length).toBe(1);
+        });
+
+    });
 });

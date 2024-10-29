@@ -107,6 +107,10 @@ class Book {
             description: this.#description
         };
     }
+    
+    toggleAvailability() {
+        this.#availability = !this.#availability;
+    }
 }
 
 /**
@@ -195,6 +199,10 @@ class Catalogue {
     getBooks() {
         return this.#books.map(book => book.viewBookDetails());
     }
+    
+    get books() {
+        return this.#books;
+    }
 }
 
 /**
@@ -214,7 +222,7 @@ class User {
     #email;
     #password;
     #role;
-    
+
     constructor(userId, name, email, password, role) {
         this.#userId = userId;
         this.#name = name;
@@ -222,7 +230,7 @@ class User {
         this.#password = password;
         this.#role = role;
     }
-    
+
     /**
      * Registers a user with the provided details
      * Also encrypts the password with the generated public key
@@ -242,12 +250,12 @@ class User {
         } else {
             user = new Member(userId, name, email, password, membershipId, borrowedBooks);
         }
-        
+
         return user;
     }
 
     /**
-     * Updates this user with the provided details 
+     * Updates this user with the provided details
      * @param newName - The new name of the user
      * @param newEmail - The new email of the user
      * @param newPassword - The new password, or blank string to not update
@@ -258,7 +266,7 @@ class User {
         this.#name = newName;
         this.#email = newEmail;
         if (newPassword !== "")
-        this.#password = newPassword;
+            this.#password = newPassword;
         if (this instanceof Member) {
             if (newMembershipId !== undefined) {
                 this._membershipId = newMembershipId;
@@ -335,7 +343,7 @@ class User {
         };
 
     }
-    
+
 }
 
 /**
@@ -365,7 +373,7 @@ class Member extends User {
      * @returns {boolean} Returns true if the book was borrowed, false if it was not
      */
     borrowBook(book) {
-
+        this.#borrowedBooks.push(book);
     }
 
     /**
@@ -373,11 +381,11 @@ class Member extends User {
      * @param book - The book to be returned
      */
     returnBook(book) {
-
+        this.#borrowedBooks.push(book);
     }
 
     /**
-     * Checks the borrowing status of all books of the member 
+     * Checks the borrowing status of all books of the member
      */
     checkBorrowingStatus() {
 
@@ -432,7 +440,7 @@ class Member extends User {
  * @classdesc Represents a librarian in the library system
  * @constructor - Creates a new librarian
  * @extends User
- * 
+ *
  */
 class Librarian extends User {
 
@@ -451,8 +459,8 @@ class Librarian extends User {
     deleteBook(book) {
 
     }
-    
-    
+
+
     registerUser(userId, name, email, password, role, membershipId = undefined, borrowedBooks=[]) {
         return super.registerUser(userId, name, email, password, role, membershipId, borrowedBooks);
     }
@@ -466,13 +474,86 @@ class Librarian extends User {
     }
 }
 
+class BorrowingRecord {
+    
+    // calculation from https://www.epochconverter.com/timestamp-list
+    // which are listed in seconds
+    static #TWO_WEEKS_EPOCH = 1209600000;
+
+    #recordId
+    #borrowedBook
+    #borrower
+    #borrowDate
+    #dueDate
+    #returnDate
+    #status
+    
+    constructor(recordId, borrowedBook, borrower, borrowDate, dueDate, status) {
+        this.#recordId = recordId;
+        this.#borrowedBook = borrowedBook;
+        this.#borrower = borrower;
+        this.#borrowDate = borrowDate;
+        this.#dueDate = dueDate;
+        this.#status = status;
+    }
+
+    static createRecord(session, borrowedBookId, borrowerId) {
+        // console.log(borrowedBookId, borrowerId)
+        // console.log(session.catalogue.getBooks())
+        // console.log(session.users)
+        const user = session.getMemberByMemberID(borrowerId);
+        let book = session.catalogue.books.filter(book => book.viewBookDetails().bookId === borrowedBookId);
+        console.log(user, book)
+        if (book.length !== 1
+            || user === null) {
+            return false;
+        }
+        book = book[0];
+        const currentDate = new Date();
+        const record =  new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf()+this.#TWO_WEEKS_EPOCH), "Borrowed");
+        
+        book.toggleAvailability();
+        user.borrowBook(book);
+        session.borrowingRecords.push(record);
+        return true;
+    }
+    
+    updateRecord() {
+        
+    }
+    
+    checkOverdue() {
+        
+    }
+}
+
 /**
  * Stores variables shared across the different models
  */
 class Session {
     constructor() {
+        this.maxBorrowRecordID = 0;
         this.users = [];
+        this.borrowingRecords = [];
         this.loggedInUser = null;
         this.catalogue = new Catalogue();
+    }
+
+    /**
+     * Gets a user by their ID
+     * Having it here instead of saying in UserManagement models is so that it can be used to get the user from other models
+     * @param userId - The ID of the user to get
+     * @returns {User|null} - The user object or null if not found
+     */
+    getUserByID(userId) {
+        const filtered = this.users.filter(user => user.userId.toString() === userId.toString());
+        return filtered.length === 1 ? filtered[0] : null;
+    }
+    
+    getMemberByMemberID(memberId) {
+        const filtered = this.users.filter(user => 
+            user instanceof Member && user.membershipId.toString() === memberId.toString()
+        );
+        return filtered.length === 1 ? filtered[0] : null;
     }
 }
