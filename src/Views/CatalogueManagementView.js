@@ -65,6 +65,7 @@ class CatalogueManagementView {
         <table id="book-table" class="table table-striped">
             <thead>
                 <tr>
+                    <th>Book ID</th>
                     <th>Title</th>
                     <th>Author</th>
                     <th>ISBN</th>
@@ -115,7 +116,7 @@ class CatalogueManagementView {
      */
     SetToRowMode(rowId, book) {
         document.getElementById(rowId).innerHTML =
-            `
+            `   <td>${book.bookId}</td>
                 <td>${book.title}</td>
                 <td>${book.author}</td>
                 <td>${book.isbn}</td>
@@ -136,53 +137,57 @@ class CatalogueManagementView {
      */
     setToEditMode(rowId, book) {
         document.getElementById(rowId).innerHTML = `
-        <td colspan="7">
+        <td colspan="8">
             <form id="book-form-${rowId}">
-              <div class="mb-3">
-                <label for="title-${rowId}" class="form-label">Book Title:</label>
-                <input type="text" class="form-control" id="title-${rowId}" placeholder="Book Title" required value="${book.title}">
-              </div>
-              
-              <div class="d-flex align-items-center gap-3 mb-3">
-                  <div class="flex-fill">
-                    <label for="author-${rowId}" class="form-label">Author:</label>
-                    <input type="text" class="form-control" id="author-${rowId}" placeholder="Author" required value="${book.author}">
-                  </div>
-              
-                  <div class="flex-fill">
-                    <label for="isbn-${rowId}" class="form-label">ISBN:</label>
-                    <input type="text" class="form-control" id="isbn-${rowId}" placeholder="ISBN" required value="${book.isbn}">
-                  </div>
-              </div>
-                  
-              <div class="d-flex align-items-center gap-3 mb-3">
-                  <div class="flex-fill">
-                    <label for="genre-${rowId}" class="form-label">Genre:</label>
-                    <input type="text" class="form-control" id="genre-${rowId}" placeholder="Genre (Optional)" value="${book.genre}">
-                  </div>
-                           
-                  <div class="flex-fill">
-                    <label for="location-${rowId}" class="form-label">Location:</label>
-                    <input type="text" class="form-control" id="location-${rowId}" placeholder="Location (Optional)" value="${book.location}">
-                  </div>
-              </div>
-              
+                <div class="d-flex gap-3 align-items-center mb-3">
+                    <div>
+                        <label for="book-id-${rowId}" class="form-label">Book ID</label>
+                        <input type="text" class="form-control" id="book-id-${rowId}" disabled value="${book.bookId}">
+                    </div>
+                    <div class="flex-fill">
+                        <label for="title-${rowId}" class="form-label">Book Title:</label>
+                        <input type="text" class="form-control" id="title-${rowId}" placeholder="Book Title" required value="${book.title}">
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="flex-fill">
+                        <label for="author-${rowId}" class="form-label">Author:</label>
+                        <input type="text" class="form-control" id="author-${rowId}" placeholder="Author" required value="${book.author}">
+                    </div>
+                    <div class="flex-fill">
+                        <label for="isbn-${rowId}" class="form-label">ISBN:</label>
+                        <input type="text" class="form-control" id="isbn-${rowId}" placeholder="ISBN" required value="${book.isbn}">
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="flex-fill">
+                        <label for="genre-${rowId}" class="form-label">Genre:</label>
+                        <input type="text" class="form-control" id="genre-${rowId}" placeholder="Genre (Optional)" value="${book.genre}">
+                    </div>
+                    <div class="flex-fill">
+                        <label for="location-${rowId}" class="form-label">Location:</label>
+                        <input type="text" class="form-control" id="location-${rowId}" placeholder="Location (Optional)" value="${book.location}">
+                    </div>
+                </div>
+                
                 <div class="mb-3">
                     <label for="description-${rowId}" class="form-label">Description:</label>
                     <textarea class="form-control" id="description-${rowId}" placeholder="Description (Optional)" rows="${Math.ceil(book.description.length / 100)}">${book.description}</textarea>
                 </div>
-              
-              <div class="d-flex align-items-center justify-content-between gap-3">
-              <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="availability-${rowId}" ${book.availability ? "checked" : ""}>
-                <label class="form-check-label" for="availability-${rowId}">Available:</label>
-              </div>
-              <div>
-                  <button type="submit" class="btn btn-warning cancel-edit" data-book-id="${book.bookId}" data-row-id="${rowId}">Cancel</button>
-                  <button type="submit" class="btn btn-primary update-book" data-book-id="${book.bookId}" data-row-id="${rowId}">Update Book</button>
-                  <button type="submit" class="btn btn-danger remove-book" data-book-id="${book.bookId}" data-isbn="${book.isbn}">Remove Book</button>
-              </div>
-              </div>
+                
+                <div class="d-flex align-items-center justify-content-between gap-3">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="availability-${rowId}" ${book.availability ? "checked" : ""}>
+                        <label class="form-check-label" for="availability-${rowId}">Available:</label>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-warning cancel-edit" data-book-id="${book.bookId}" data-row-id="${rowId}">Cancel</button>
+                        <button type="submit" class="btn btn-primary update-book" data-book-id="${book.bookId}" data-row-id="${rowId}">Update Book</button>
+                        <button type="submit" class="btn btn-danger remove-book" data-book-id="${book.bookId}" data-isbn="${book.isbn}">Remove Book</button>
+                    </div>
+                </div>
             </form>
         </td>`
     }
