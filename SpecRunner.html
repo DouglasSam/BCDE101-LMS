@@ -14,11 +14,33 @@
   <!-- optional: include a file here that configures the Jasmine env -->
   <script src="lib/jasmine-5.4.0/boot1.js"></script>
 
-  <!-- include source files here... -->
-    <script src="src/LibraryModel.js"></script>
-    <script src="src/LibraryView.js"></script>
-<!--    <script src="src/LibraryController.js"></script>-->
-    <script src="src/lib/Classes.js"></script>
+  <!-- Libraries -->
+  <script src="src/lib/Book.js"></script>
+  <script src="src/lib/BorrowingRecord.js"></script>
+  <script src="src/lib/Catalogue.js"></script>
+  <script src="src/lib/Session.js"></script>
+  <script src="src/lib/User.js"></script>
+
+  <!-- Models -->
+  <script src="src/Models/BorrowRecordManagerModel.js"></script>
+  <script src="src/Models/CatalogueManagementModel.js"></script>
+  <script src="src/Models/HomeModel.js"></script>
+  <script src="src/Models/SearchModel.js"></script>
+  <script src="src/Models/UserManagementModel.js"></script>
+
+  <!-- Controllers -->
+  <script src="src/Controllers/BorrowRecordManagerController.js"></script>
+  <script src="src/Controllers/CatalogueManagementController.js"></script>
+  <script src="src/Controllers/HomeController.js"></script>
+  <script src="src/Controllers/SearchController.js"></script>
+  <script src="src/Controllers/UserManagementController.js"></script>
+
+  <!-- Views -->
+  <script src="src/Views/BorrowRecordManagerView.js"></script>
+  <script src="src/Views/CatalogueManagementView.js"></script>
+  <script src="src/Views/HomeView.js"></script>
+  <script src="src/Views/SearchView.js"></script>
+  <script src="src/Views/UserManagementView.js"></script>
 
   <!-- include spec files here... -->
   <script src="src/test/LibrarySpec.js"></script>
