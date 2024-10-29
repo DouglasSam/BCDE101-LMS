@@ -86,7 +86,7 @@ class UserManagementView {
         let rowNum = 1;
         users.forEach(user => {
             const row = document.createElement('tr');
-            row.id = `book-${rowNum++}`;
+            row.id = `user-${rowNum++}`;
             this.userTableBody.appendChild(row);
             this.SetToRowMode(row.id, user);
         });
