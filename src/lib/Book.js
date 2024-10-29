@@ -53,7 +53,6 @@ class Book {
      * @returns {this is *[]|boolean} Returns true if the book matches the search query, false if it does not
      */
     searchBooks({ query = false, id = false, title = false, author = false, isbn = false, genre = false, location = false, description = false, availableOnly = false } = {}) {
-        // console.log(id, this.#bookId);
         if (query !== false) {
             return this.#title.toLowerCase().includes(query.toLowerCase()) ||
                 this.#author.toLowerCase().includes(query.toLowerCase()) ||
