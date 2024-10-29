@@ -23,6 +23,13 @@ class BorrowRecordManagerModel {
         return BorrowingRecord.createRecord(this.session, bookId, memberId);
     }
     
+    findRecordById(recordId) {
+        const filtered = this.session.borrowingRecords.filter(record => record.recordDetails.recordId.toString() === recordId.toString());
+        if (filtered.length !== 1) return false;
+        return filtered[0];
+        
+    }
+    
     loadBorrowingRecordFromStorage() {
         let recordsJSON = localStorage.getItem('library_borrowing_records');
         let records = recordsJSON ? JSON.parse(recordsJSON) : [];
@@ -37,10 +44,19 @@ class BorrowRecordManagerModel {
                 if (record.returnDate) {
                     returnDate = new Date(record.returnDate);
                 }
+                this.session.maxBorrowRecordID = Math.max(this.session.maxBorrowRecordID, record.recordId+1);
                 const borrowingRecord = new BorrowingRecord(record.recordId, book[0], member, borrowDate, dueDate, record.status, returnDate);
                 this.session.borrowingRecords.push(borrowingRecord);
             }
         });
+    }
+    
+    userReturnsBook(record) {
+        record.updateRecord("Returned");
+        const userName = record.recordDetails.borrower.name; // Assuming `name` is a property of the borrower
+        const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title; // Assuming `title` is a property of the borrowed book
+        alert(`User ${userName} has returned ${bookTitle}`);
+        this.session.saveBorrowingRecordsToStorage();
     }
 
 }

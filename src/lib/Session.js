@@ -2,8 +2,11 @@
  * Stores variables shared across the different models
  */
 class Session {
+    
+    static #START_BORROW_RECORD_ID = 5000
+    
     constructor() {
-        this.maxBorrowRecordID = 0;
+        this.maxBorrowRecordID = Session.#START_BORROW_RECORD_ID;
         this.users = [];
         this.borrowingRecords = [];
         this.loggedInUser = null;
@@ -48,7 +51,6 @@ class Session {
      */
     saveBorrowingRecordsToStorage() {
         let recordsJSON = JSON.stringify(this.borrowingRecords.map(record => record.recordJSON));
-        // console.log(recordsJSON);
         localStorage.setItem('library_borrowing_records', recordsJSON);
     }
     

@@ -22,6 +22,68 @@ class BorrowRecordManagerController {
         
         const borrowForm = document.getElementById('borrow-form');
         borrowForm.addEventListener('submit', this.handleAddRecord.bind(this));
+        this.addButtonListeners();
+    }
+    
+    addButtonListeners() {
+        const showDetailsActionsButtons = document.querySelectorAll('.view-detail-btn');
+        showDetailsActionsButtons.forEach(button => {
+            button.addEventListener('click', this.handleShowRecordDetail.bind(this));
+        });
+        const cancelDetailsButtons = document.querySelectorAll('.cancel-btn');
+        cancelDetailsButtons.forEach(button => {
+            button.addEventListener('click', this.handleCancelDetails.bind(this));
+        });
+        const checkOverdueButtons = document.querySelectorAll('.check-overdue-btn');
+        checkOverdueButtons.forEach(button => {
+            button.addEventListener('click', this.handleCheckOverdue.bind(this));
+        });
+        const updateReturnDateButtons = document.querySelectorAll('.update-return-date-btn');
+        updateReturnDateButtons.forEach(button => {
+            button.addEventListener('click', this.handleUpdateReturnDate.bind(this));
+        });
+        const returnBookButtons = document.querySelectorAll('.return-book-btn');
+        returnBookButtons.forEach(button => {
+            button.addEventListener('click', this.handleReturnBook.bind(this));
+        });
+        
+    }
+    
+    handleReturnBook(event) {
+        const recordID = event.target.getAttribute('data-record-id');
+        const rowID = event.target.getAttribute('data-row-id');
+        const record = this.model.findRecordById(recordID);
+        if (record) {
+            this.model.userReturnsBook(record)
+            this.view.setToRowMode(rowID, record);
+            this.addButtonListeners();
+        }
+    }
+    
+    handleUpdateReturnDate(event) {
+        
+    }
+
+    handleCheckOverdue(event) {
+        
+    }
+
+    handleCancelDetails(event) {
+        const rowID = event.target.getAttribute('data-row-id');
+        const recordID = event.target.getAttribute('data-record-id');
+        const record = this.model.findRecordById(recordID);
+        this.view.setToRowMode(rowID, record);
+        this.addButtonListeners();
+    }
+    
+    handleShowRecordDetail(event) {
+        const rowID = event.target.getAttribute('data-row-id');
+        const id = event.target.getAttribute('data-record-id');
+        const record = this.model.findRecordById(id);
+        if (record) {
+            this.view.setToDetailsMode(rowID, record);
+            this.addButtonListeners();
+        }
         
     }
 

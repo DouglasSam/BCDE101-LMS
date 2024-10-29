@@ -65,7 +65,7 @@ class BorrowRecordManagerView {
             const row = document.createElement('tr');
             row.id = `record-${rowNum++}`;
             this.userTableBody.appendChild(row);
-            this.SetToRowMode(row.id, record);
+            this.setToRowMode(row.id, record);
         });
     }
 
@@ -74,7 +74,7 @@ class BorrowRecordManagerView {
      * @param rowId - The id of the row to update
      * @param record - The user to display the details from
      */
-    SetToRowMode(rowId, record) {
+    setToRowMode(rowId, record) {
         const details = record.recordDetails;
         const book = details.borrowedBook.viewBookDetails();
         document.getElementById(rowId).innerHTML =
@@ -84,13 +84,79 @@ class BorrowRecordManagerView {
                 <td>${book.title}</td>
                 <td>${details.borrower.membershipId}</td>
                 <td>${details.borrower.email}</td>
-                <td>${details.dueDate.toDateString()}</td>
+                <td>${details.dueDate}</td>
                 <td>${details.returnDate}</td>
                 <td>${details.status}</td>                 
                 <td>
-                    <button class="update-btn btn btn-primary" data-user-id="${details.recordId}" data-row-id="${rowId}">Edit or Delete Row</button>
+                    <button class="view-detail-btn btn btn-primary" data-record-id="${details.recordId}" data-row-id="${rowId}">Details and Actions</button>
                 </td>
             `
+    }
+    
+    setToDetailsMode(rowId, record) {
+        const details = record.recordDetails;
+        const book = details.borrowedBook.viewBookDetails();
+        const member = details.borrower;
+        document.getElementById(rowId).innerHTML =
+            `
+                <td colspan="9">
+               
+                    <h3 class="text-center">Borrower (Member) details</h3>
+                    <div class="member-details d-flex gap-3 justify-content-around">
+                        <div>
+                            <p><b>User ID: </b>${member.userId}</>
+                            <p><b>Full Name: </b>${member.name}</p>
+                        </div>
+                        <div>
+                            <p><b>Email: </b><a href="mailto:${member.email}">${member.email}</a></p>
+                            <p><b>Member ID: </b>${member.membershipId}</p>
+                        </div>
+                    </div>
+                    <hr class="w-75 m-auto">
+                    <h3 class="text-center">Borrowed Book Details</h3>
+                    <div class="member-details d-flex gap-3 justify-content-around">
+                        <div>
+                            <p><b>Book ID: </b>${book.bookId}</>
+                            <p><b>ISBN: </b>${book.isbn}</>
+                        </div>
+                        <div>
+                            <p><b>Title: </b>${book.title}</p>
+                            <p><b>Genre: </b>${book.genre}</p>
+                        </div>
+                        <div>
+                            <p><b>Author: </b>${book.author}</p>
+                            <p><b>Location: </b>${book.location}</p>
+                        </div>
+                    </div>
+                    <hr class="w-75 m-auto">
+                    <h3 class="text-center">Record Details</h3>
+                    <div class="member-details d-flex gap-3 justify-content-around">
+                        <div>
+                            <p><b>Record ID: </b>${details.recordId}</>
+                            <p><b>Borrow Date: </b>${details.borrowDate}</>
+                        </div>
+                        <div>
+                            <p><b>Status: </b>${details.status}</p>
+                            <p><b>Due Date: </b>${details.dueDate}</p>
+                        </div>
+                        <div>
+                            <p><b>Return Date: </b>${details.returnDate}</p>
+                        </div>
+                    </div>
+                    <hr class="w-75 m-auto">
+                    <div class="d-flex justify-content-around mt-3">
+                        <button class="cancel-btn btn btn-warning" data-row-id="${rowId}" data-record-id="${details.recordId}">Cancel</button>
+                        <button id="check-overdue-${rowId}" class="check-overdue-btn btn btn-success" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>Check Overdue</button>
+                        <button id="update-return-date-${rowId}" class="update-return-date-btn btn btn-primary" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>Update Return Date</button>
+                        <button id="return-book-${rowId}" class="return-book-btn btn btn-danger" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>User Returns Book</button>
+                    </div>
+                </td>
+            `
+            if (details.returnDate === "NA") {
+                document.getElementById(`return-book-${rowId}`).hidden = false;
+                document.getElementById(`check-overdue-${rowId}`).hidden = false;
+                document.getElementById(`update-return-date-${rowId}`).hidden = false;
+            }
     }
 
 }

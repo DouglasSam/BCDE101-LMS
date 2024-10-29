@@ -46,12 +46,21 @@ class BorrowingRecord {
         return true;
     }
 
-    updateRecord() {
-
+    updateRecord(status) {
+        this.#status = status;
+        if (status === "Returned") {
+            this.#returnDate = new Date();
+            this.#borrowedBook.toggleAvailability();
+            this.#borrower.returnBook(this.#borrowedBook);
+        }
+        
     }
 
     checkOverdue() {
-
+        if (this.#status === "On Loan" && this.#dueDate < new Date()) {
+            this.#status = "Overdue";
+        }
+        
     }
 
     get recordJSON() {
@@ -71,9 +80,9 @@ class BorrowingRecord {
             recordId: this.#recordId,
             borrowedBook: this.#borrowedBook,
             borrower: this.#borrower,
-            borrowDate: this.#borrowDate,
-            returnDate: this.#returnDate ? this.#returnDate : "NA",
-            dueDate: this.#dueDate,
+            borrowDate: this.#borrowDate.toDateString(),
+            returnDate: this.#returnDate ? this.#returnDate.toDateString() : "NA",
+            dueDate: this.#dueDate.toDateString(),
             status: this.#status
         }
     }
