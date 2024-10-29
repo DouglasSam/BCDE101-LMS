@@ -53,10 +53,22 @@ class BorrowRecordManagerModel {
     
     userReturnsBook(record) {
         record.updateRecord("Returned");
-        const userName = record.recordDetails.borrower.name; // Assuming `name` is a property of the borrower
-        const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title; // Assuming `title` is a property of the borrowed book
+        const userName = record.recordDetails.borrower.name; 
+        const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title; 
         alert(`User ${userName} has returned ${bookTitle}`);
         this.session.saveBorrowingRecordsToStorage();
+    }
+    
+    checkOverdue(record) {
+        const user = record.recordDetails.borrower;
+        const userName = user.name;
+        const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title;
+        if (record.checkOverdue()) {
+            alert(`User ${userName} has an overdue book: ${bookTitle}\nSending Overdue notification to User.`);
+            this.session.notifications.push(new Notification(this.session.maxNotificationID++, user, `You have an overdue book: ${bookTitle}`), "Created");
+            this.session.saveBorrowingRecordsToStorage();
+        }
+        alert(`${bookTitle}, on loan to ${userName}, is not overdue`);
     }
 
 }

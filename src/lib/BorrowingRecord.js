@@ -59,7 +59,9 @@ class BorrowingRecord {
     checkOverdue() {
         if (this.#status === "On Loan" && this.#dueDate < new Date()) {
             this.#status = "Overdue";
+            return true;
         }
+        return false;
         
     }
 

@@ -65,7 +65,14 @@ class BorrowRecordManagerController {
     }
 
     handleCheckOverdue(event) {
-        
+        const recordID = event.target.getAttribute('data-record-id');
+        const rowID = event.target.getAttribute('data-row-id');
+        const record = this.model.findRecordById(recordID);
+        if (record) {
+            this.model.checkOverdue(record);
+            this.view.setToDetailsMode(rowID, record);
+            this.addButtonListeners();
+        }
     }
 
     handleCancelDetails(event) {

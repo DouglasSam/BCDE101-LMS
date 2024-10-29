@@ -4,11 +4,14 @@
 class Session {
     
     static #START_BORROW_RECORD_ID = 5000
+    static #START_NOTIFICATION_ID = 7000;
     
     constructor() {
         this.maxBorrowRecordID = Session.#START_BORROW_RECORD_ID;
+        this.maxNotificationID = Session.#START_NOTIFICATION_ID;
         this.users = [];
         this.borrowingRecords = [];
+        this.notifications = [];
         this.loggedInUser = null;
         this.catalogue = new Catalogue();
     }
