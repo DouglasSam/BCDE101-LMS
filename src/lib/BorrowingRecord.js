@@ -22,19 +22,16 @@ class BorrowingRecord {
     }
 
     static createRecord(session, borrowedBookId, borrowerId) {
-        // console.log(borrowedBookId, borrowerId)
-        // console.log(session.catalogue.getBooks())
-        // console.log(session.users)
         const user = session.getMemberByMemberID(borrowerId);
-        let book = session.catalogue.books.filter(book => book.viewBookDetails().bookId === borrowedBookId);
-        console.log(user, book)
+        let book = session.catalogue.books.filter(book => 
+            book.viewBookDetails().bookId.toString() === borrowedBookId.toString());
         if (book.length !== 1
             || user === null) {
             return false;
         }
         book = book[0];
         const currentDate = new Date();
-        const record = new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf() + this.#TWO_WEEKS_EPOCH), "Borrowed");
+        const record = new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf() + this.#TWO_WEEKS_EPOCH), "On Loan");
 
         book.toggleAvailability();
         user.borrowBook(book);
@@ -48,5 +45,18 @@ class BorrowingRecord {
 
     checkOverdue() {
 
+    }
+
+    get recordDetails() {
+        console.log(this)
+        return {
+            recordId: this.#recordId,
+            borrowedBook: this.#borrowedBook,
+            borrower: this.#borrower,
+            borrowDate: this.#borrowDate,
+            returnDate: this.#returnDate ? this.#returnDate : "NA",
+            dueDate: this.#dueDate,
+            status: this.#status
+        }
     }
 }

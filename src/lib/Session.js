@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     controllers.set('catalogue-management', new CatalogueManagementController(new CatalogueManagementModel(session), new CatalogueManagementView()));
-    controllers.set('borrow-record-management', new BorrowRecordManagerController(new BorrowRecordManagerModel(), new BorrowRecordManagerView()));
+    controllers.set('borrow-record-management', new BorrowRecordManagerController(new BorrowRecordManagerModel(session), new BorrowRecordManagerView()));
     controllers.set('catalogue-search', new SearchController(new SearchModel(session), new SearchView()));
     controllers.set('user-management', new UserManagementController(userManagementModel, new UserManagementView()));
     controllers.set('home', new HomeController(homeModel, new HomeView()));
