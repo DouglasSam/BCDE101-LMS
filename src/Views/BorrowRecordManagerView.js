@@ -12,6 +12,7 @@ class BorrowRecordManagerView {
     render(numRecords) {
         document.getElementById("main").innerHTML =
             `<h2>Welcome to the Borrowing Record Manager Page</h2>
+            <div id="modal" hidden></div>
         <h3>Loan out a book:</h3>
         <form id="borrow-form">
             <div class="d-flex align-items-center gap-3 mb-3">
@@ -50,6 +51,7 @@ class BorrowRecordManagerView {
 
         this.userTableBody = document.querySelector('#records-table tbody');
         this.tableCount = document.getElementById('records-shown');
+        this.modal = document.getElementById('modal');
         
     }
 
@@ -147,7 +149,7 @@ class BorrowRecordManagerView {
                     <div class="d-flex justify-content-around mt-3">
                         <button class="cancel-btn btn btn-warning" data-row-id="${rowId}" data-record-id="${details.recordId}">Cancel</button>
                         <button id="check-overdue-${rowId}" class="check-overdue-btn btn btn-success" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>Check Overdue</button>
-                        <button id="update-return-date-${rowId}" class="update-return-date-btn btn btn-primary" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>Update Return Date</button>
+                        <button id="update-due-date-${rowId}" class="update-due-date-btn btn btn-primary" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>Update Due Date</button>
                         <button id="return-book-${rowId}" class="return-book-btn btn btn-danger" data-row-id="${rowId}" data-record-id="${details.recordId}" hidden>User Returns Book</button>
                     </div>
                 </td>
@@ -155,8 +157,36 @@ class BorrowRecordManagerView {
             if (details.returnDate === "NA") {
                 document.getElementById(`return-book-${rowId}`).hidden = false;
                 document.getElementById(`check-overdue-${rowId}`).hidden = false;
-                document.getElementById(`update-return-date-${rowId}`).hidden = false;
+                document.getElementById(`update-due-date-${rowId}`).hidden = false;
             }
+    }
+
+
+    viewUpdateDueDateModal(rowId, record) {
+        this.modal.hidden = false;
+        const book = record.recordDetails.borrowedBook.viewBookDetails();
+        const user = record.recordDetails.borrower;
+        const date = record.recordDetails.formDueDate;
+        this.modal.innerHTML = `
+        <dialog id="change-due-date-dialog">
+                <h3 class="text-center">You are changing the due date for<br>${book.title}<br>on load to ${user.name}</h3>
+                <h4>Enter new due date</h4>
+               <form id="new-due-date-form" data-record-id="${record.recordDetails.recordId}" data-row-id="${rowId}">
+                  <div class="row mb-3">
+                    <label for="new-due-date" class="col-4 col-form-label">New Due Date:</label>
+                    <div class="col-8">
+                      <input type="date" class="form-control" id="new-due-date" value="${date}" required>
+                    </div>
+                  </div>
+                  <button id="set-new-due-date" type="submit" class="btn btn-primary">Update Due Date</button>
+                  <a id="cancel-modal" class="btn btn-danger">Cancel</a>
+                </form>
+                
+            </dialog>
+        `
+        const dueDateDialog = document.getElementById('change-due-date-dialog');
+        dueDateDialog.showModal();
+        document.getElementById("cancel-modal").addEventListener("click", () => dueDateDialog.close());
     }
 
 }

@@ -46,17 +46,32 @@ class BorrowingRecord {
         return true;
     }
 
-    updateRecord(status) {
-        this.#status = status;
-        if (status === "Returned") {
-            this.#returnDate = new Date();
-            this.#borrowedBook.toggleAvailability();
-            this.#borrower.returnBook(this.#borrowedBook);
+    updateRecord(update) {
+        if (update instanceof Date) {
+            this.#dueDate = update;
         }
+        else if (update instanceof String) {
+            this.#status = update;
+            if (update === "Returned") {
+                this.#returnDate = new Date();
+                this.#borrowedBook.toggleAvailability();
+                this.#borrower.returnBook(this.#borrowedBook);
+            }
+        }
+        
         
     }
 
     checkOverdue() {
+        //check to see if book was overdue and due date has been moved.
+        if (this.#status === "Overdue") {
+            //book is no longer overdue
+            if (this.#dueDate > new Date()) {
+                this.#status = "On Loan";
+                return false;
+            }
+            return true;
+        }
         if (this.#status === "On Loan" && this.#dueDate < new Date()) {
             this.#status = "Overdue";
             return true;
@@ -85,6 +100,7 @@ class BorrowingRecord {
             borrowDate: this.#borrowDate.toDateString(),
             returnDate: this.#returnDate ? this.#returnDate.toDateString() : "NA",
             dueDate: this.#dueDate.toDateString(),
+            formDueDate: this.#dueDate.toLocaleDateString().replace(/^(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1"),
             status: this.#status
         }
     }

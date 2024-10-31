@@ -38,9 +38,9 @@ class BorrowRecordManagerController {
         checkOverdueButtons.forEach(button => {
             button.addEventListener('click', this.handleCheckOverdue.bind(this));
         });
-        const updateReturnDateButtons = document.querySelectorAll('.update-return-date-btn');
-        updateReturnDateButtons.forEach(button => {
-            button.addEventListener('click', this.handleUpdateReturnDate.bind(this));
+        const updateDueDateButtons = document.querySelectorAll('.update-due-date-btn');
+        updateDueDateButtons.forEach(button => {
+            button.addEventListener('click', this.handleShowDueDateModal.bind(this));
         });
         const returnBookButtons = document.querySelectorAll('.return-book-btn');
         returnBookButtons.forEach(button => {
@@ -60,8 +60,30 @@ class BorrowRecordManagerController {
         }
     }
     
-    handleUpdateReturnDate(event) {
-        
+    handleShowDueDateModal(event) {
+        const recordId = event.target.getAttribute('data-record-id');
+        const rowId = event.target.getAttribute('data-row-id');
+        const record = this.model.findRecordById(recordId);
+        if (record) {
+            this.view.viewUpdateDueDateModal(rowId, record);
+            document.getElementById("new-due-date-form").addEventListener("submit", this.handleUpdateDueDate.bind(this));
+        }
+    }
+
+    handleUpdateDueDate(event) {
+        event.preventDefault();
+        const recordId = event.target.getAttribute('data-record-id');
+        const rowId = event.target.getAttribute('data-row-id');
+        const newDueDateString = document.getElementById('new-due-date').value;
+        const record = this.model.findRecordById(recordId);
+        if (record) {
+            if (this.model.updateDueDate(record, newDueDateString)) {
+                const dueDateDialog = document.getElementById('change-due-date-dialog');
+                dueDateDialog.close();
+                this.view.setToDetailsMode(rowId, record);
+                this.addButtonListeners();
+            }
+        }
     }
 
     handleCheckOverdue(event) {

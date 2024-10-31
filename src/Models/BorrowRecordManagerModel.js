@@ -68,7 +68,30 @@ class BorrowRecordManagerModel {
             this.session.notifications.push(new Notification(this.session.maxNotificationID++, user, `You have an overdue book: ${bookTitle}`), "Created");
             this.session.saveBorrowingRecordsToStorage();
         }
-        alert(`${bookTitle}, on loan to ${userName}, is not overdue`);
+        else {
+            alert(`${bookTitle}, on loan to ${userName}, is not overdue`);
+        }
+    }
+    
+    updateDueDate(record, newDateString) {
+        const user = record.recordDetails.borrower;
+        const userName = user.name;
+        const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title;
+        const newDueDate = new Date(newDateString);
+        // New due date should not be before the current, 
+        // Allowing for the fact of testing as I have a default length of two weeks for 
+        // borrowing a book with a start date of date.now(), and no other way to make a book overdue.
+        // wrapping them in new Date to ignore the fact of time. Only want to look at date.
+        if (new Date(new Date().toDateString()).getTime() >= new Date(newDueDate.toDateString()).getTime()) {
+            if (!confirm("The new due date is earlier than the current date, are you sure you want to change the date?")) {
+                return false;
+            }
+        }
+        record.updateRecord(newDueDate);
+        alert(`${bookTitle} borrowed by ${userName} has a new due date of ${newDueDate.toLocaleDateString()}
+        You might need to run "Check Overdue" to check its new status.`)
+        this.session.saveBorrowingRecordsToStorage();
+        return true;
     }
 
 }
