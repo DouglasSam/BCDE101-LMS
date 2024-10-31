@@ -125,13 +125,18 @@ class UserManagementController {
      */
     handleRemoveUser(event) {
         event.preventDefault();
-        const userId = event.target.attributes.item(2).value;
+        const userId = event.target.attributes.getNamedItem("data-user-id").value;
         const user = this.model.getUserByID(userId);
         if (user !== null) {
             if (confirm(`Are you sure you want to permanently delete ${user.name}?`)) {
                 if (this.model.removeUser(user)) {
                     this.view.updateUserTable(this.model.session.users);
                     this.addButtonListeners();
+                }
+                else {
+                    // Could fail because user is logged in or doesn't exist
+                    // More user-friendly to give general error.
+                    alert("Deleting the User failed.")
                 }
             }
         }

@@ -161,9 +161,9 @@ class UserManagementView {
                     <p class="text-danger">An error occured updating user, could be a duplicate email or membership ID</p>
                 </div>
                 <div class="d-flex align-items-center justify-content-between gap-3">
-                    <button type="submit" class="btn btn-warning cancel-edit" data-user-id="${user.userId}" data-row-id="${rowId}">Cancel</button>
+                    <a class="btn btn-warning cancel-edit" data-user-id="${user.userId}" data-row-id="${rowId}">Cancel</a>
                     <button type="submit" class="btn btn-primary update-user" data-user-id="${user.userId}" data-row-id="${rowId}">Update User</button>
-                    <button type="submit" class="btn btn-danger remove-user" data-user-id="${user.userId}">Remove User</button>
+                    <a class="btn btn-danger remove-user" data-user-id="${user.userId}">Remove User</a>
                 </div>
             </form>
         </td>

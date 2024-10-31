@@ -48,7 +48,8 @@ class UserManagementModel {
         if (newEmail !== user.email && this.getUserByEmail(newEmail) !== null) return false
         if (newMembershipId !== undefined && this.session.users.filter(user => {
             if (user.membershipId === undefined) return false;
-            return user.membershipId.toString() === newMembershipId
+            if (newMembershipId !== user.membershipId && this.session.getMemberByMemberID(newMembershipId))
+                return false;
         }).length > 0) return false;
         user.updateUser(newName, newEmail, newPassword, role, newMembershipId);
         if (this.session.loggedInUser.userId === userId) this.session.loggedInUser = user;
