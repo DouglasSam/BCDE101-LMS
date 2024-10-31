@@ -65,13 +65,22 @@ class BorrowRecordManagerModel {
         const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title;
         if (record.checkOverdue()) {
             alert(`User ${userName} has an overdue book: ${bookTitle}\nSending Overdue notification to User.`);
-            this.session.notifications.push(new Notification(this.session.maxNotificationID++, user, `You have an overdue book: ${bookTitle}`), "Created");
+            const dateNow = new Date();
+            const daysLate = (new Date(dateNow.toDateString()).getTime() - record.recordDetails.dueDateTime)/Session.EPOCH_MILLI_TO_DAYS;
+            const notification = new Notification(
+                this.session.maxNotificationID++, user, 
+                `Hi ${userName}, You have an overdue book: ${bookTitle} that is ${daysLate} days overdue.`, "Created"
+            );
+            this.session.notifications.push(notification);
+            notification.sendOverdueNotification();
             this.session.saveBorrowingRecordsToStorage();
         }
         else {
             alert(`${bookTitle}, on loan to ${userName}, is not overdue`);
         }
     }
+    // 1730408363
+    // 1730408375358
     
     updateDueDate(record, newDateString) {
         const user = record.recordDetails.borrower;

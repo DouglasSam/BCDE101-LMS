@@ -20,6 +20,7 @@ class Notification {
          */
         console.log(`Sending overdue notification to ${this.#user.email}
         Message: ${this.#message}`);
+        this.#status = "Sent to user";
 
     }
 

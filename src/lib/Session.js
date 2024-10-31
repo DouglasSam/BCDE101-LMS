@@ -6,6 +6,8 @@ class Session {
     static #START_BORROW_RECORD_ID = 5000
     static #START_NOTIFICATION_ID = 7000;
     
+    static EPOCH_MILLI_TO_DAYS = 1000*3600*24;
+    
     constructor() {
         this.maxBorrowRecordID = Session.#START_BORROW_RECORD_ID;
         this.maxNotificationID = Session.#START_NOTIFICATION_ID;

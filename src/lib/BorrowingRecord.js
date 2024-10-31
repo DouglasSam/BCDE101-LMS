@@ -101,6 +101,7 @@ class BorrowingRecord {
             returnDate: this.#returnDate ? this.#returnDate.toDateString() : "NA",
             dueDate: this.#dueDate.toDateString(),
             formDueDate: this.#dueDate.toLocaleDateString().replace(/^(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1"),
+            dueDateTime: new Date(this.#dueDate.toDateString()).getTime(),
             status: this.#status
         }
     }
