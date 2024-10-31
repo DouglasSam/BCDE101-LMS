@@ -82,7 +82,7 @@ class BorrowRecordManagerModel {
         // Allowing for the fact of testing as I have a default length of two weeks for 
         // borrowing a book with a start date of date.now(), and no other way to make a book overdue.
         // wrapping them in new Date to ignore the fact of time. Only want to look at date.
-        if (new Date(new Date().toDateString()).getTime() >= new Date(newDueDate.toDateString()).getTime()) {
+        if (new Date(Date.now()).getTime() >= new Date(newDueDate.toDateString()).getTime()) {
             if (!confirm("The new due date is earlier than the current date, are you sure you want to change the date?")) {
                 return false;
             }
