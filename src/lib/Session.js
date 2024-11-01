@@ -2,10 +2,13 @@
  * Stores variables shared across the different models
  */
 class Session {
+
+    static DATE_FROM_DATETIME = (datetime) => {
+        return new Date(datetime.toDateString());
+    };
     
     static #START_BORROW_RECORD_ID = 5000
     static #START_NOTIFICATION_ID = 7000;
-    
     static EPOCH_MILLI_TO_DAYS = 1000*3600*24;
     
     constructor() {

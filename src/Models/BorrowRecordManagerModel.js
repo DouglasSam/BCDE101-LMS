@@ -65,7 +65,7 @@ class BorrowRecordManagerModel {
         const bookTitle = record.recordDetails.borrowedBook.viewBookDetails().title;
         if (record.checkOverdue()) {
             alert(`User ${userName} has an overdue book: ${bookTitle}\nSending Overdue notification to User.`);
-            const dateNow = BorrowingRecord.DATE_FROM_DATETIME(new Date());
+            const dateNow = Session.DATE_FROM_DATETIME(new Date());
             const daysLate = (dateNow - record.recordDetails.dueDateObject)/Session.EPOCH_MILLI_TO_DAYS;
             const notification = new Notification(
                 this.session.maxNotificationID++, user, 

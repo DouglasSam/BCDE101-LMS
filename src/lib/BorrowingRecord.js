@@ -1,8 +1,5 @@
 class BorrowingRecord {
 
-    static DATE_FROM_DATETIME = (datetime) => {
-        return new Date(datetime.toDateString());
-    };
     //Change this to change teh default loan time in days
     static #LOAN_TIME_DAYS = 14;
     // DO NOT CHANGE THIS, used for calculating the due date.
@@ -37,7 +34,7 @@ class BorrowingRecord {
             return false;
         }
         book = book[0];
-        const currentDate = BorrowingRecord.DATE_FROM_DATETIME(new Date());
+        const currentDate = Session.DATE_FROM_DATETIME(new Date());
         const record = new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf() + this.#LOAN_TIME_MILLI), "On Loan");
 
         book.toggleAvailability();
@@ -57,7 +54,7 @@ class BorrowingRecord {
         else if (update instanceof String) {
             this.#status = update;
             if (update === "Returned") {
-                this.#returnDate = BorrowingRecord.DATE_FROM_DATETIME(new Date());
+                this.#returnDate = Session.DATE_FROM_DATETIME(new Date());
                 this.#borrowedBook.toggleAvailability();
                 this.#borrower.returnBook(this.#borrowedBook);
             }
@@ -70,13 +67,13 @@ class BorrowingRecord {
         //check to see if book was overdue and due date has been moved.
         if (this.#status === "Overdue") {
             //book is no longer overdue
-            if (this.#dueDate > BorrowingRecord.DATE_FROM_DATETIME(new Date())) {
+            if (this.#dueDate > Session.DATE_FROM_DATETIME(new Date())) {
                 this.#status = "On Loan";
                 return false;
             }
             return true;
         }
-        if (this.#status === "On Loan" && this.#dueDate < BorrowingRecord.DATE_FROM_DATETIME(new Date())) {
+        if (this.#status === "On Loan" && this.#dueDate < Session.DATE_FROM_DATETIME(new Date())) {
             this.#status = "Overdue";
             return true;
         }
