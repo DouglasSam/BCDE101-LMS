@@ -6,11 +6,11 @@ class Session {
     static DATE_FROM_DATETIME = (datetime) => {
         return new Date(datetime.toDateString());
     };
-    
+
     static #START_BORROW_RECORD_ID = 5000
     static #START_NOTIFICATION_ID = 7000;
-    static EPOCH_MILLI_TO_DAYS = 1000*3600*24;
-    
+    static EPOCH_MILLI_TO_DAYS = 1000 * 3600 * 24;
+
     constructor() {
         this.maxBorrowRecordID = Session.#START_BORROW_RECORD_ID;
         this.maxNotificationID = Session.#START_NOTIFICATION_ID;
@@ -53,7 +53,7 @@ class Session {
         let usersJSON = JSON.stringify(this.users.map(user => user.JSONObject));
         localStorage.setItem('library_users', usersJSON);
     }
-    
+
     /**
      * Saves the borrowing records in the session to local storage
      */
@@ -61,7 +61,19 @@ class Session {
         let recordsJSON = JSON.stringify(this.borrowingRecords.map(record => record.recordJSON));
         localStorage.setItem('library_borrowing_records', recordsJSON);
     }
-    
+
+    /**
+     * Gets the notifications that have been generated for a member
+     * @param member - The member to get the notifications for
+     * @returns {*[]} - The notifications sent to the member or null if none found
+     */
+    findNotificationsSentToMember(member) {
+        const filtered =  this.notifications.filter(notification =>
+            notification.details.user === member
+        );
+        return filtered.length === 0 ? null : filtered;
+    }
+
 }
 
 

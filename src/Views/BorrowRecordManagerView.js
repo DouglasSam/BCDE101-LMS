@@ -52,7 +52,7 @@ class BorrowRecordManagerView {
         this.userTableBody = document.querySelector('#records-table tbody');
         this.tableCount = document.getElementById('records-shown');
         this.modal = document.getElementById('modal');
-        
+
     }
 
     /**
@@ -94,8 +94,8 @@ class BorrowRecordManagerView {
                 </td>
             `
     }
-    
-    setToDetailsMode(rowId, record) {
+
+    setToDetailsMode(rowId, record, notifications) {
         const details = record.recordDetails;
         const book = details.borrowedBook.viewBookDetails();
         const member = details.borrower;
@@ -143,6 +143,7 @@ class BorrowRecordManagerView {
                         </div>
                         <div>
                             <p><b>Return Date: </b>${details.returnDate}</p>
+                            <a class="link-primary" href="#" id="notification-${rowId}" hidden>User Notification Logs</a>
                         </div>
                     </div>
                     <hr class="w-75 m-auto">
@@ -154,11 +155,48 @@ class BorrowRecordManagerView {
                     </div>
                 </td>
             `
-            if (details.returnDate === "NA") {
-                document.getElementById(`return-book-${rowId}`).hidden = false;
-                document.getElementById(`check-overdue-${rowId}`).hidden = false;
-                document.getElementById(`update-due-date-${rowId}`).hidden = false;
-            }
+        if (details.returnDate === "NA") {
+            document.getElementById(`return-book-${rowId}`).hidden = false;
+            document.getElementById(`check-overdue-${rowId}`).hidden = false;
+            document.getElementById(`update-due-date-${rowId}`).hidden = false;
+        }
+        if (notifications !== null) {
+            document.getElementById(`notification-${rowId}`).hidden = false;
+            document.getElementById(`notification-${rowId}`).addEventListener('click', (event) => {
+                event.preventDefault();
+                this.viewNotificationsModal(notifications, member);
+            });
+        }
+    }
+    
+    viewNotificationsModal(notifications, member) {
+        console.log(notifications[0].details);
+        this.modal.hidden = false;
+        this.modal.innerHTML = `
+        <dialog id="notifications-dialog">
+                <h3 class="text-center">Notification Logs for ${member.name}</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <th>Notification ID</th>
+                        <th>Notification</th>
+                        <th>Status</th>
+                    </thead>
+                    <tbody>
+                        ${notifications.map(notification => `
+                            <tr>
+                                <td>${notification.details.notificationId}</td>
+                                <td>${notification.details.message}</td>
+                                <td>${notification.details.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <button id="close-notifications" class="btn btn-primary">Close</button>
+            </dialog>
+        `
+        const notificationsDialog = document.getElementById('notifications-dialog');
+        notificationsDialog.showModal();
+        document.getElementById("close-notifications").addEventListener("click", () => notificationsDialog.close());
     }
 
 

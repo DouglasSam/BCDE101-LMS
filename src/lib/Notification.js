@@ -21,7 +21,15 @@ class Notification {
         console.log(`Sending overdue notification to ${this.#user.email}
         Message: ${this.#message}`);
         this.#status = "Sent to user";
-
+    }
+    
+    get details() {
+        return {
+            notificationId: this.#notificationId,
+            user: this.#user,
+            message: this.#message,
+            status: this.#status,
+        }
     }
 
 }

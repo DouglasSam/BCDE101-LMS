@@ -92,7 +92,8 @@ class BorrowRecordManagerController {
         const record = this.model.findRecordById(recordID);
         if (record) {
             this.model.checkOverdue(record);
-            this.view.setToDetailsMode(rowID, record);
+            this.view.setToDetailsMode(rowID, record,
+                this.model.session.findNotificationsSentToMember(record.recordDetails.borrower));
             this.addButtonListeners();
         }
     }
@@ -110,7 +111,8 @@ class BorrowRecordManagerController {
         const id = event.target.getAttribute('data-record-id');
         const record = this.model.findRecordById(id);
         if (record) {
-            this.view.setToDetailsMode(rowID, record);
+            this.view.setToDetailsMode(rowID, record, 
+                this.model.session.findNotificationsSentToMember(record.recordDetails.borrower));
             this.addButtonListeners();
         }
         
