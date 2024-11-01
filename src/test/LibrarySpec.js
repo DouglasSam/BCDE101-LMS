@@ -246,18 +246,19 @@ describe("Library Management System", () => {
             expect(newUser.userId).toBe(userId);
             expect(newUser.membershipId).toBe(newMembershipId);
             //cannot have the same membershipId
-            // "name": "Boris Hudson",
-            //     "email": "borishudson5804@outlook.com",
-            //     "password": "VLO96EIL7HW",
+            // "name": "Ramona Rivas",
+            //     "email": "ramonarivas8711@icloud.net",
+            //     "password": "RFP19IQB6QO",
             //     "role": "member"
-            user = userModel.getUserByEmail("borishudson5804@outlook.com");
+            user = userModel.getUserByEmail("ramonarivas8711@icloud.net");
             userId = user.userId;
-            newName = "Boris Hudson";
-            newEmail = 'borishudson5804@outlook.com';
+            newName = "Ramona Rivas";
+            newEmail = 'ramonarivas8711@icloud.netx';
             newPassword = "";
             newRole = "Member";
             newMembershipId = "1234";
             newUser = userModel.updateUser(userId, newName, newEmail, newPassword, newRole, newMembershipId);
+            // console.log(userModel.session.users);
             expect(newUser).toBeFalse();
 
             

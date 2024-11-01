@@ -46,11 +46,9 @@ class UserManagementModel {
         const user = this.getUserByID(userId);
         if (user === null) return false;
         if (newEmail !== user.email && this.getUserByEmail(newEmail) !== null) return false
-        if (newMembershipId !== undefined && this.session.users.filter(user => {
-            if (user.membershipId === undefined) return false;
-            if (newMembershipId !== user.membershipId && this.session.getMemberByMemberID(newMembershipId))
-                return false;
-        }).length > 0) return false;
+        if (newMembershipId !== undefined && user.role === "Member" && user.membershipId !== newMembershipId) {
+            if (this.session.getMemberByMemberID(newMembershipId) !== null) return false;
+        }
         user.updateUser(newName, newEmail, newPassword, role, newMembershipId);
         if (this.session.loggedInUser.userId === userId) this.session.loggedInUser = user;
         this.session.saveUsersToStorage();
