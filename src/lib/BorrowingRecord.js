@@ -34,6 +34,9 @@ class BorrowingRecord {
             return false;
         }
         book = book[0];
+        if (!book.viewBookDetails().availability) {
+            return false; 
+        }
         const currentDate = Session.DATE_FROM_DATETIME(new Date());
         const record = new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf() + this.#LOAN_TIME_MILLI), "On Loan");
 

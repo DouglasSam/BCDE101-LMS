@@ -137,7 +137,6 @@ describe("Library Management System", () => {
             userModel.loadUsersFromStorage();
             expect(userModel.session.users.length).toBe(2);
             expect(JSON.stringify(userModel.session.users.map(user => user.JSONObject))).toBe(originalStorage);
-            console.log(userModel.session.users.map(user => user.JSONObject));
             
         });
 
@@ -282,6 +281,26 @@ describe("Library Management System", () => {
             expect(session.borrowingRecords.length).toBe(1)
             expect(searchModel.searchBooks({id: 1})[0].availability).toBeFalse();
             expect(session.users[0].borrowedBooks.length).toBe(1);
+        });
+
+        it("should not be able to borrow a book if the user is not a member", () => {
+            const book = searchModel.searchBooks({id: 1})[0];
+            let borrowRecord = searchModel.borrowBook(book, 123);
+            expect(borrowRecord).toBeFalse();
+            expect(session.borrowingRecords.length).toBe(0)
+            expect(searchModel.searchBooks({id: 1})[0].availability).toBeTrue();
+            expect(session.users[0].borrowedBooks.length).toBe(0);
+        });
+
+        it("should not be able to borrow a book if the book is not available", () => {
+            searchModel.session.catalogue.books.filter(book =>
+                book.viewBookDetails().bookId.toString() === "1")[0].toggleAvailability();
+            const book = searchModel.searchBooks({id: 1})[0];
+            let borrowRecord = searchModel.borrowBook(book, 1234);
+            expect(borrowRecord).toBeFalse();
+            expect(session.borrowingRecords.length).toBe(0)
+            expect(searchModel.searchBooks({id: 1})[0].availability).toBeFalse();
+            expect(session.users[0].borrowedBooks.length).toBe(0);
         });
 
     });
