@@ -1,8 +1,12 @@
 class BorrowingRecord {
 
-    // calculation from https://www.epochconverter.com/timestamp-list
-    // which are listed in seconds
-    static #TWO_WEEKS_EPOCH = 1209600000;
+    static DATE_FROM_DATETIME = (datetime) => {
+        return new Date(datetime.toDateString());
+    };
+    //Change this to change teh default loan time in days
+    static #LOAN_TIME_DAYS = 14;
+    // DO NOT CHANGE THIS, used for calculating the due date.
+    static #LOAN_TIME_MILLI = BorrowingRecord.#LOAN_TIME_DAYS * Session.EPOCH_MILLI_TO_DAYS;
 
     #recordId
     #borrowedBook
@@ -33,8 +37,8 @@ class BorrowingRecord {
             return false;
         }
         book = book[0];
-        const currentDate = new Date();
-        const record = new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf() + this.#TWO_WEEKS_EPOCH), "On Loan");
+        const currentDate = BorrowingRecord.DATE_FROM_DATETIME(new Date());
+        const record = new BorrowingRecord(session.maxBorrowRecordID++, book, user, currentDate, new Date(currentDate.valueOf() + this.#LOAN_TIME_MILLI), "On Loan");
 
         book.toggleAvailability();
         user.borrowBook(book);
@@ -53,7 +57,7 @@ class BorrowingRecord {
         else if (update instanceof String) {
             this.#status = update;
             if (update === "Returned") {
-                this.#returnDate = new Date();
+                this.#returnDate = BorrowingRecord.DATE_FROM_DATETIME(new Date());
                 this.#borrowedBook.toggleAvailability();
                 this.#borrower.returnBook(this.#borrowedBook);
             }
@@ -66,13 +70,13 @@ class BorrowingRecord {
         //check to see if book was overdue and due date has been moved.
         if (this.#status === "Overdue") {
             //book is no longer overdue
-            if (this.#dueDate > new Date()) {
+            if (this.#dueDate > BorrowingRecord.DATE_FROM_DATETIME(new Date())) {
                 this.#status = "On Loan";
                 return false;
             }
             return true;
         }
-        if (this.#status === "On Loan" && this.#dueDate < new Date()) {
+        if (this.#status === "On Loan" && this.#dueDate < BorrowingRecord.DATE_FROM_DATETIME(new Date())) {
             this.#status = "Overdue";
             return true;
         }
@@ -101,7 +105,7 @@ class BorrowingRecord {
             returnDate: this.#returnDate ? this.#returnDate.toDateString() : "NA",
             dueDate: this.#dueDate.toDateString(),
             formDueDate: this.#dueDate.toLocaleDateString().replace(/^(\d{2})\/(\d{2})\/(\d{4})/, "$3-$2-$1"),
-            dueDateTime: new Date(this.#dueDate.toDateString()).getTime(),
+            dueDateObject: this.#dueDate,
             status: this.#status
         }
     }
